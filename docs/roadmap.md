@@ -1,7 +1,7 @@
 # DealXin — Roadmap
 
 > Last updated: 2026-06-11
-> Status: Phase 0 — Planning
+> Status: Phase 5 — Ingestion & Adapters ✓ | Phase 6 — Event-Driven
 
 ---
 
@@ -113,29 +113,31 @@ dealxin/
 - [ ] Unit + integration tests
 
 ### Phase 4 — Frontend MVP
-- [ ] Landing page (taste-skill direction, hallmark audit)
-- [ ] Deals listing page
-- [ ] Deal detail page
-- [ ] Login / Register pages
-- [ ] User dashboard (saved deals, price tracking, notifications)
-- [ ] Admin dashboard (overview, moderation, sources, analytics)
-- [ ] Typed API client
-- [ ] TanStack Query integration
+- [x] Landing page (taste-skill direction, hallmark audit)
+- [x] Deals listing page
+- [x] Deal detail page
+- [x] Login / Register pages
+- [x] User dashboard (saved deals, price tracking, notifications)
+- [x] Admin dashboard (overview, moderation, sources, analytics)
+- [x] Typed API client
+- [x] TanStack Query integration
+- [x] Hallmark UI audit (13 issues fixed)
+- [x] Playwright smoke tests (8/8 passing)
 - [ ] Loading / error / empty states
 - [ ] Responsive mobile layout
-- [ ] Playwright smoke tests
 
 ### Phase 5 — Ingestion and Adapters
-- [ ] Ingestion module
-- [ ] MockShopeeAdapter
-- [ ] MockLazadaAdapter
-- [ ] MockTikTokShopAdapter
-- [ ] JsonFeedAdapter
-- [ ] CsvImportAdapter
-- [ ] Data normalization to DealDTO
-- [ ] Idempotency check
-- [ ] CrawlerJob model
-- [ ] Retry logic
+- [x] Ingestion module (controller + service)
+- [x] MockShopeeAdapter (5 mock deals, 500ms delay)
+- [x] MockLazadaAdapter (3 mock deals)
+- [x] MockTikTokShopAdapter (3 mock deals)
+- [x] JsonImportAdapter (supports deals/items/data arrays)
+- [x] CsvImportAdapter (quoted CSV parsing)
+- [x] Data normalization to DealDTO
+- [x] Idempotency check (by sourceUrl)
+- [x] CrawlerJob model + migration
+- [x] SourceAdapter interface + AdapterFactory
+- [x] API endpoints: import/json, import/csv, crawl/:sourceType, jobs, jobs/:id
 
 ### Phase 6 — Event-Driven and Microservices-Ready
 - [ ] RabbitMQ integration

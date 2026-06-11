@@ -7,6 +7,7 @@ import {
 import { type Deal, DealStatus } from "@prisma/client";
 
 import { type AuditLogService } from "../common/audit-log.service";
+import { type OutboxService } from "../common/outbox.service";
 import { PaginatedResponse } from "../common/pagination";
 import { type PrismaService } from "../prisma/prisma.service";
 import {
@@ -46,6 +47,7 @@ export class DealsService {
     private readonly auditLog: AuditLogService,
     private readonly repository: DealRepository,
     private readonly statusTransition: DealStatusTransitionStrategy,
+    private readonly outbox: OutboxService,
   ) {}
 
   async createDeal(
@@ -77,6 +79,25 @@ export class DealsService {
       entityType: "Deal",
       entityId: deal.id,
       metadata: { title: deal.title, platform: deal.platform },
+    });
+
+    await this.outbox.emit("Deal", deal.id, "DealSubmitted", {
+      eventId: crypto.randomUUID(),
+      eventType: "DealSubmitted",
+      occurredAt: new Date().toISOString(),
+      version: 1,
+      payload: {
+        dealId: deal.id,
+        title: deal.title,
+        slug: deal.slug,
+        platform: deal.platform,
+        categoryId: deal.categoryId ?? "",
+        salePrice: deal.salePrice,
+        originalPrice: deal.originalPrice,
+        discountPercent: deal.discountPercent,
+        sourceUrl: deal.sourceUrl ?? "",
+        createdById: deal.createdById,
+      },
     });
 
     return this.toResponseDto(deal);
@@ -263,6 +284,27 @@ export class DealsService {
       metadata: { title: deal.title, platform: deal.platform },
     });
 
+    await this.outbox.emit("Deal", id, "DealApproved", {
+      eventId: crypto.randomUUID(),
+      eventType: "DealApproved",
+      occurredAt: new Date().toISOString(),
+      version: 1,
+      payload: {
+        dealId: deal.id,
+        title: deal.title,
+        slug: deal.slug,
+        platform: deal.platform,
+        categoryId: deal.categoryId ?? "",
+        salePrice: deal.salePrice,
+        originalPrice: deal.originalPrice,
+        discountPercent: deal.discountPercent,
+        sourceUrl: deal.sourceUrl ?? "",
+        createdById: deal.createdById,
+        approvedById: adminId,
+        score: deal.score,
+      },
+    });
+
     return this.toResponseDto(deal);
   }
 
@@ -297,6 +339,27 @@ export class DealsService {
       metadata: { title: deal.title, reason },
     });
 
+    await this.outbox.emit("Deal", id, "DealRejected", {
+      eventId: crypto.randomUUID(),
+      eventType: "DealRejected",
+      occurredAt: new Date().toISOString(),
+      version: 1,
+      payload: {
+        dealId: deal.id,
+        title: deal.title,
+        slug: deal.slug,
+        platform: deal.platform,
+        categoryId: deal.categoryId ?? "",
+        salePrice: deal.salePrice,
+        originalPrice: deal.originalPrice,
+        discountPercent: deal.discountPercent,
+        sourceUrl: deal.sourceUrl ?? "",
+        createdById: deal.createdById,
+        rejectedById: adminId,
+        reason: reason ?? undefined,
+      },
+    });
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return this.toResponseDto(deal as any);
   }
@@ -326,6 +389,18 @@ export class DealsService {
       entityType: "Deal",
       entityId: id,
       metadata: { title: deal.title },
+    });
+
+    await this.outbox.emit("Deal", id, "DealExpired", {
+      eventId: crypto.randomUUID(),
+      eventType: "DealExpired",
+      occurredAt: new Date().toISOString(),
+      version: 1,
+      payload: {
+        dealId: deal.id,
+        slug: deal.slug,
+        expiredById: adminId,
+      },
     });
 
     return this.toResponseDto(deal);

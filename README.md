@@ -13,6 +13,7 @@
 | Phase 2 | Database & Auth | ✓ Done |
 | Phase 3 | Deals Core | ✓ Done |
 | Phase 4 | Frontend MVP | ✓ Done |
+| Phase 5 | Ingestion & Adapters | ✓ Done |
 
 Đang xây dựng theo từng phase. Xem [docs/roadmap.md](docs/roadmap.md) để biết tiến độ.
 
@@ -82,7 +83,7 @@ packages/
 | 2 | Database & Auth | ✓ Done |
 | 3 | Deals Core | ✓ Done |
 | 4 | Frontend MVP | ✓ Done |
-| 5 | Ingestion & Adapters | Pending |
+| 5 | Ingestion & Adapters | ✓ Done |
 | 6 | Event-Driven & Microservices | Pending |
 | 7 | Search | Pending |
 | 8 | Notifications & Realtime | Pending |
