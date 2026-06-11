@@ -1,10 +1,8 @@
-/** @type {import("eslint").Linter.Config} */
-module.exports = {
-  extends: ['./base.js'],
-  rules: {
-    '@typescript-eslint/no-unused-vars': [
-      'error',
-      { argsIgnorePattern: '^_', varsIgnorePattern: '^_', types: '_' },
-    ],
+import { base } from './base.js';
+
+export const nestjs = [
+  ...base,
+  {
+    ignores: ['dist/**', 'node_modules/**', 'coverage/**', '*.config.js'],
   },
-};
+];

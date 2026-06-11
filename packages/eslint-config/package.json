@@ -2,7 +2,9 @@
   "name": "@dealxin/eslint-config",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "exports": {
+    ".": "./index.js",
     "./next.js": "./next.js",
     "./nestjs.js": "./nestjs.js",
     "./base.js": "./base.js"
