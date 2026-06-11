@@ -1,12 +1,21 @@
 # Documentation
 
 ## Architecture
+
+- [ADR: Architecture Style](./adr/adr-0001-architecture-style.md)
+- [ADR: Database Choice](./adr/adr-0002-database-choice.md)
+- [ADR: Event Broker Choice](./adr/adr-0003-event-broker-choice.md)
+- [ADR: Search Engine Choice](./adr/adr-0004-search-engine-choice.md)
+- [ADR: Package Manager](./adr/adr-0005-package-manager.md)
 - [ADR: Outbox Pattern](./adr/adr-001-outbox-pattern.md) — Event publishing strategy
 - [ADR: Adapter Pattern](./adr/adr-002-adapter-pattern.md) — Data ingestion design
-- [Database ERD](./database-erd.md) — Entity relationship diagram
-- [API Documentation](./api-docs.md) — REST API reference
+- [Database ERD](./database-erd.md)
+- [API Documentation](./api-docs.md)
 
 ## Development
-- [Roadmap](./roadmap.md) — Project phases and progress
-- [CV Bullets](./cv-bullets.md) — Technical achievements for resume
-- [Interview Q&A](./interview-qa.md) — Architecture decisions and deep dives
+
+- [Roadmap](./roadmap.md)
+- [Testing Guide](./testing.md)
+- [Deployment Guide](./deployment.md)
+- [CV Bullets](./cv-bullets.md)
+- [Interview Q&A](./interview-qa.md)
