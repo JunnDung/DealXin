@@ -13,7 +13,7 @@ describe("JwtStrategy", () => {
     jest.clearAllMocks();
     strategy = new JwtStrategy(
       mockPrisma as never,
-      { get: (key: string) => "test-secret" } as never,
+      { get: (_key: string) => "test-secret" } as never,
     );
   });
 
