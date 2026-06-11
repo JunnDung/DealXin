@@ -292,7 +292,7 @@ export default function AdminPage() {
           <button
             key={stat.key}
             onClick={() => setStatusFilter(stat.key)}
-            className={`rounded-xl border p-4 text-left transition-all ${
+            className={`rounded-xl border p-4 text-left transition-colors ${
               statusFilter === stat.key
                 ? "border-primary bg-primary/5"
                 : "border-border bg-card hover:border-primary/30"

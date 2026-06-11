@@ -59,20 +59,27 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4 sm:px-6 lg:px-8">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 shrink-0">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+    <header className="sticky top-0 z-50 w-full border-b border-border/70 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+      <div className="mx-auto flex h-15 items-center gap-3 px-4 sm:px-6 lg:px-8 max-w-7xl">
+        {/* Logo — distinctive Saffron mark with editorial typographic logo */}
+        <Link href="/" className="flex items-center gap-2.5 shrink-0 group">
+          <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary shadow-sm ring-1 ring-primary/20 transition-transform group-hover:scale-105">
             <Tag className="h-4 w-4 text-primary-foreground" />
+            {/* Small accent dot — a visual signature */}
+            <span className="absolute -right-1 -top-0.5 h-2 w-2 rounded-full bg-amber-400 ring-1 ring-background" />
           </div>
-          <span className="font-vietnam text-xl font-bold tracking-tight">
-            Deal<span className="text-primary">Xin</span>
-          </span>
+          <div className="flex items-baseline gap-0.5">
+            <span className="font-vietnam text-lg font-bold tracking-tight text-foreground">
+              Deal
+            </span>
+            <span className="font-vietnam text-lg font-bold tracking-tight text-primary">
+              Xin
+            </span>
+          </div>
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden items-center gap-1 md:flex">
+        <nav className="hidden items-center gap-0.5 md:flex">
           {navLinks.map((link) => {
             const active =
               pathname === link.href ||
@@ -116,10 +123,11 @@ export function Header() {
             size="icon"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             className="h-9 w-9"
+            aria-label="Chuyển giao diện sáng/tối"
           >
             <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
             <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-            <span className="sr-only">Toggle theme</span>
+            <span className="sr-only">Chuyển giao diện</span>
           </Button>
 
           {isHydrated && !user ? (
@@ -134,7 +142,7 @@ export function Header() {
           ) : isHydrated && user ? (
             <div className="hidden items-center gap-2 sm:flex">
               <Button variant="outline" size="sm" asChild>
-                <Link href="/deals/new">
+                <Link href="/deals/new" className="whitespace-nowrap">
                   <PlusCircle className="mr-1.5 h-3.5 w-3.5" />
                   Đăng deal
                 </Link>

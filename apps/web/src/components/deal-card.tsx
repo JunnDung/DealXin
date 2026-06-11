@@ -69,9 +69,10 @@ export function DealCard({
   voting = false,
 }: DealCardProps) {
   const [localUpvotes, setLocalUpvotes] = useState(deal.upvoteCount);
-  const [localDownvotes, setLocalDownvotes] = useState(deal.downvoteCount);
+  const [_localDownvotes, setLocalDownvotes] = useState(deal.downvoteCount);
   const [hasVotedUp, setHasVotedUp] = useState(false);
   const [hasVotedDown, setHasVotedDown] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const handleVote = (type: "up" | "down") => {
     if (voting) return;
@@ -103,55 +104,114 @@ export function DealCard({
     onVote?.(type);
   };
 
+  const handleCopy = () => {
+    if (!deal.couponCode) return;
+    navigator.clipboard.writeText(deal.couponCode);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   const isHot = deal.score >= 80 || localUpvotes >= 50;
   const isExpiring =
     deal.endDate && new Date(deal.endDate).getTime() - Date.now() < 86400000;
 
+  const hasCoupon = !!deal.couponCode;
+  const hasDiscount = deal.discountPercent > 0;
+
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-all hover:border-primary/30 hover:shadow-lg">
-      {/* Image */}
+    <article
+      className={[
+        "group relative flex flex-col overflow-hidden rounded-xl border bg-card transition-shadow",
+        isHot && !hasCoupon
+          ? "border-red-200 dark:border-red-900 shadow-sm"
+          : hasCoupon
+            ? "border-primary/20 shadow-sm"
+            : "border-border hover:border-primary/30 hover:shadow-md",
+      ].join(" ")}
+    >
+      {/* ── Image ── */}
       {deal.imageUrl && (
         <Link
           href={`/deals/${deal.slug}`}
-          className="relative block aspect-[16/9] overflow-hidden bg-muted"
+          className="relative block overflow-hidden bg-muted"
+          style={{ aspectRatio: "16/9" }}
         >
           <img
             src={deal.imageUrl}
             alt={deal.title}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
-          {deal.discountPercent > 0 && (
-            <div className="absolute left-2 top-2 rounded-md bg-primary px-1.5 py-0.5 text-xs font-bold text-primary-foreground">
-              -{deal.discountPercent}%
+          {/* Discount badge */}
+          {hasDiscount && (
+            <div className="absolute left-0 top-3 flex items-center gap-1 rounded-r-lg bg-primary px-2.5 py-1 text-xs font-bold text-primary-foreground shadow-sm">
+              <span>−{deal.discountPercent}%</span>
             </div>
           )}
+          {/* Hot badge */}
           {isHot && (
-            <div className="absolute right-2 top-2 rounded-md bg-red-500 px-1.5 py-0.5 text-xs font-bold text-white flex items-center gap-0.5">
+            <div className="absolute right-0 top-3 flex items-center gap-1 rounded-l-lg bg-red-500 px-2.5 py-1 text-xs font-bold text-white shadow-sm">
               <TrendingUp className="h-3 w-3" />
-              Hot
+              <span>HOT</span>
+            </div>
+          )}
+          {/* Expiring countdown strip */}
+          {isExpiring && (
+            <div className="absolute bottom-0 left-0 right-0 bg-red-600/90 px-2 py-1 text-center text-xs font-semibold text-white">
+              <Clock className="mr-1 inline-block h-3 w-3" />
+              Sắp hết hạn — còn{" "}
+              {Math.ceil(
+                (new Date(deal.endDate!).getTime() - Date.now()) / 3600000,
+              )}
+              h
             </div>
           )}
         </Link>
       )}
 
-      <div className="flex flex-1 flex-col p-4">
-        {/* Platform + meta */}
+      {/* ── Coupon strip (prominent only for coupon deals) ── */}
+      {hasCoupon && (
+        <div className="border-b border-dashed border-primary/30 bg-primary/5 px-3 py-2">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5">
+              <span className="rounded bg-primary/20 px-1.5 py-0.5 text-xs font-semibold text-primary">
+                MÃ
+              </span>
+              <code className="font-mono text-sm font-bold tracking-wider text-foreground">
+                {deal.couponCode}
+              </code>
+            </div>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-6 px-2 text-xs font-semibold text-primary hover:bg-primary/10"
+              onClick={handleCopy}
+            >
+              {copied ? "✓ Đã copy" : "Copy"}
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Body ── */}
+      <div className="flex flex-1 flex-col p-3.5">
+        {/* Platform + meta row */}
         <div className="mb-2 flex items-center justify-between">
           <Badge
-            variant="secondary"
-            className={`${platformColors[deal.platform]} text-white border-0 text-xs`}
+            className={`${platformColors[deal.platform]} border-0 text-white text-xs font-semibold`}
           >
             <ShoppingBag className="mr-1 h-2.5 w-2.5" />
             {platformLabels[deal.platform]}
           </Badge>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             {deal.viewCount > 0 && (
-              <span className="flex items-center gap-0.5">
+              <span className="flex items-center gap-0.5 tabular-nums">
                 <Eye className="h-3 w-3" />
-                {deal.viewCount}
+                {deal.viewCount >= 1000
+                  ? `${(deal.viewCount / 1000).toFixed(1)}k`
+                  : deal.viewCount}
               </span>
             )}
-            <span className="flex items-center gap-0.5">
+            <span className="flex items-center gap-0.5 tabular-nums">
               <Clock className="h-3 w-3" />
               {timeAgo(deal.createdAt)}
             </span>
@@ -159,119 +219,108 @@ export function DealCard({
         </div>
 
         {/* Title */}
-        <Link href={`/deals/${deal.slug}`} className="group/title">
+        <Link href={`/deals/${deal.slug}`} className="group/title mb-2 flex-1">
           <h3 className="line-clamp-2 text-sm font-semibold leading-snug text-foreground transition-colors group-hover/title:text-primary">
             {deal.title}
           </h3>
         </Link>
 
-        {/* Price */}
-        <div className="mt-2 flex items-baseline gap-2">
-          <span className="text-lg font-bold text-primary">
+        {/* Price row */}
+        <div className="flex items-baseline gap-2">
+          <span className="font-jakarta text-xl font-bold text-primary tabular-nums">
             {formatPrice(deal.salePrice, deal.currency)}
           </span>
           {deal.originalPrice > deal.salePrice && (
-            <span className="text-sm text-muted-foreground line-through">
+            <span className="text-sm text-muted-foreground line-through tabular-nums">
               {formatPrice(deal.originalPrice, deal.currency)}
             </span>
           )}
         </div>
 
-        {/* Coupon */}
-        {deal.couponCode && (
-          <div className="mt-1.5 flex items-center gap-1.5">
-            <code className="rounded bg-accent px-1.5 py-0.5 text-xs font-mono font-medium text-accent-foreground">
-              {deal.couponCode}
-            </code>
-          </div>
-        )}
-
-        {/* Expiring badge */}
-        {isExpiring && (
-          <div className="mt-2">
-            <Badge variant="destructive" className="text-xs">
-              <Clock className="mr-1 h-3 w-3" />
-              Sắp hết hạn
-            </Badge>
-          </div>
-        )}
-
-        {/* Footer actions */}
-        <div className="mt-auto flex items-center justify-between pt-3 border-t border-border">
-          <div className="flex items-center gap-1">
+        {/* Footer: community actions left, buy right */}
+        <div className="mt-auto flex items-center justify-between pt-3">
+          {/* Vote + bookmark — subtle */}
+          <div className="flex items-center gap-0.5">
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={`h-7 px-1.5 text-xs ${
-                    hasVotedUp ? "text-green-600" : "text-muted-foreground"
-                  }`}
+                <button
+                  className={[
+                    "flex h-7 items-center gap-1 rounded-md px-1.5 text-xs transition-colors",
+                    hasVotedUp
+                      ? "bg-green-50 text-green-700 dark:bg-green-950 dark:text-green-400"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                  ].join(" ")}
                   onClick={() => handleVote("up")}
                   disabled={voting}
+                  aria-label="Thích deal này"
                 >
                   <ThumbsUp
-                    className={`mr-1 h-3.5 w-3.5 ${hasVotedUp ? "fill-current" : ""}`}
+                    className={`h-3.5 w-3.5 ${hasVotedUp ? "fill-current" : ""}`}
                   />
-                  {localUpvotes}
-                </Button>
+                  <span className="tabular-nums">{localUpvotes}</span>
+                </button>
               </TooltipTrigger>
               <TooltipContent>Thích deal này</TooltipContent>
             </Tooltip>
 
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={`h-7 px-1.5 text-xs ${
-                    hasVotedDown ? "text-red-500" : "text-muted-foreground"
-                  }`}
+                <button
+                  className={[
+                    "flex h-7 items-center gap-1 rounded-md px-1.5 text-xs transition-colors",
+                    hasVotedDown
+                      ? "bg-red-50 text-red-600 dark:bg-red-950 dark:text-red-400"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                  ].join(" ")}
                   onClick={() => handleVote("down")}
                   disabled={voting}
+                  aria-label="Không thích"
                 >
                   <ThumbsDown
-                    className={`mr-1 h-3.5 w-3.5 ${hasVotedDown ? "fill-current" : ""}`}
+                    className={`h-3.5 w-3.5 ${hasVotedDown ? "fill-current" : ""}`}
                   />
-                  {localDownvotes}
-                </Button>
+                </button>
               </TooltipTrigger>
               <TooltipContent>Không thích</TooltipContent>
             </Tooltip>
-          </div>
 
-          <div className="flex items-center gap-1">
             {onBookmark && (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className={`h-7 w-7 p-0 ${
+                  <button
+                    className={[
+                      "ml-0.5 flex h-7 w-7 items-center justify-center rounded-md text-xs transition-colors",
                       deal.isBookmarked
                         ? "text-primary"
-                        : "text-muted-foreground"
-                    }`}
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                    ].join(" ")}
                     onClick={onBookmark}
+                    aria-label={deal.isBookmarked ? "Bỏ lưu" : "Lưu deal"}
                   >
                     <Bookmark
                       className={`h-4 w-4 ${deal.isBookmarked ? "fill-current" : ""}`}
                     />
-                  </Button>
+                  </button>
                 </TooltipTrigger>
                 <TooltipContent>
                   {deal.isBookmarked ? "Bỏ lưu" : "Lưu deal"}
                 </TooltipContent>
               </Tooltip>
             )}
-
-            <Button variant="default" size="sm" className="h-7" asChild>
-              <a href={deal.dealUrl} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="mr-1 h-3 w-3" />
-                Mua
-              </a>
-            </Button>
           </div>
+
+          {/* Buy button — dominant */}
+          <Button size="sm" className="gap-1.5 font-semibold" asChild>
+            <a
+              href={deal.dealUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Mua tại ${platformLabels[deal.platform]}`}
+            >
+              <ExternalLink className="h-3.5 w-3.5" />
+              Mua
+            </a>
+          </Button>
         </div>
       </div>
     </article>

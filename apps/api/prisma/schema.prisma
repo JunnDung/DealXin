@@ -123,6 +123,9 @@ model Deal {
   updatedAt       DateTime   @updatedAt
   deletedAt       DateTime?
 
+  // External ID from source platform (for idempotency)
+  externalId      String?
+
   categoryId String?
   category   DealCategory? @relation(fields: [categoryId], references: [id])
 

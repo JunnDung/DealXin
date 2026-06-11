@@ -253,62 +253,102 @@ export default function DealDetailPage({ params }: DealDetailPageProps) {
 
         {/* Right: Sidebar */}
         <div className="space-y-4">
-          {/* Stats */}
-          <div className="rounded-xl border border-border bg-card p-5 space-y-3">
-            <div className="flex items-center gap-3 text-sm">
-              <Eye className="h-4 w-4 text-muted-foreground" />
-              <span>{deal.viewCount} lượt xem</span>
-            </div>
-            <div className="flex items-center gap-3 text-sm">
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
-              <span>Score: {deal.score}</span>
-            </div>
-            <div className="flex items-center gap-3 text-sm">
-              <Clock className="h-4 w-4 text-muted-foreground" />
-              <span>{timeAgo(deal.createdAt)}</span>
-            </div>
-            {deal.endDate && (
-              <div className="flex items-center gap-3 text-sm">
-                <Clock className="h-4 w-4 text-muted-foreground" />
-                <span>Hết hạn: {formatDate(deal.endDate)}</span>
+          {/* Stats — editorial fact sheet */}
+          <div className="rounded-xl border border-border bg-card p-5">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Thông tin
+            </p>
+            <dl className="space-y-2.5">
+              <div className="flex items-center justify-between">
+                <dt className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Eye className="h-3.5 w-3.5" />
+                  Lượt xem
+                </dt>
+                <dd className="font-medium tabular-nums">
+                  {deal.viewCount >= 1000
+                    ? `${(deal.viewCount / 1000).toFixed(1)}k`
+                    : deal.viewCount}
+                </dd>
               </div>
-            )}
+              <div className="flex items-center justify-between">
+                <dt className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <TrendingUp className="h-3.5 w-3.5" />
+                  Score
+                </dt>
+                <dd className="font-medium tabular-nums">{deal.score}</dd>
+              </div>
+              <div className="flex items-center justify-between">
+                <dt className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Clock className="h-3.5 w-3.5" />
+                  Đăng
+                </dt>
+                <dd className="text-sm text-muted-foreground">
+                  {timeAgo(deal.createdAt)}
+                </dd>
+              </div>
+              {deal.endDate && (
+                <div className="flex items-center justify-between">
+                  <dt className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Clock className="h-3.5 w-3.5" />
+                    Hết hạn
+                  </dt>
+                  <dd className="text-sm text-muted-foreground">
+                    {formatDate(deal.endDate)}
+                  </dd>
+                </div>
+              )}
+            </dl>
           </div>
 
-          {/* Actions */}
-          <div className="rounded-xl border border-border bg-card p-5 space-y-3">
-            <p className="text-sm font-semibold">Bình chọn</p>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                className="flex-1 gap-1.5"
+          {/* Community score */}
+          <div className="rounded-xl border border-border bg-card p-5">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Cộng đồng đánh giá
+            </p>
+            <div className="flex gap-3">
+              <button
+                className="flex flex-1 flex-col items-center gap-1 rounded-lg border border-border bg-card p-3 transition-colors hover:bg-green-50 hover:border-green-200 dark:hover:bg-green-950/30"
                 onClick={() =>
                   user
                     ? voteMutation.mutate({ id: deal.id, type: "up" })
-                    : toast({ variant: "destructive", title: "Hãy đăng nhập" })
+                    : toast({
+                        variant: "destructive",
+                        title: "Hãy đăng nhập",
+                      })
                 }
+                aria-label={`Thích — ${deal.upvoteCount} lượt`}
               >
-                <ThumbsUp className="h-4 w-4" />
-                {deal.upvoteCount}
-              </Button>
-              <Button
-                variant="outline"
-                className="flex-1 gap-1.5"
+                <ThumbsUp className="h-5 w-5 text-green-600" />
+                <span className="font-semibold tabular-nums text-green-700 dark:text-green-400">
+                  {deal.upvoteCount}
+                </span>
+                <span className="text-xs text-muted-foreground">Thích</span>
+              </button>
+
+              <button
+                className="flex flex-1 flex-col items-center gap-1 rounded-lg border border-border bg-card p-3 transition-colors hover:bg-red-50 hover:border-red-200 dark:hover:bg-red-950/30"
                 onClick={() =>
                   user
                     ? voteMutation.mutate({ id: deal.id, type: "down" })
-                    : toast({ variant: "destructive", title: "Hãy đăng nhập" })
+                    : toast({
+                        variant: "destructive",
+                        title: "Hãy đăng nhập",
+                      })
                 }
+                aria-label={`Không thích — ${deal.downvoteCount} lượt`}
               >
-                <ThumbsDown className="h-4 w-4" />
-                {deal.downvoteCount}
-              </Button>
+                <ThumbsDown className="h-5 w-5 text-red-500" />
+                <span className="font-semibold tabular-nums text-red-600 dark:text-red-400">
+                  {deal.downvoteCount}
+                </span>
+                <span className="text-xs text-muted-foreground">Không</span>
+              </button>
             </div>
 
             {isHydrated && user && (
               <Button
                 variant={deal.isBookmarked ? "default" : "outline"}
-                className="w-full gap-1.5"
+                className="mt-3 w-full gap-1.5"
                 onClick={() => bookmarkMutation.mutate(deal.id)}
               >
                 <Bookmark
@@ -320,7 +360,7 @@ export default function DealDetailPage({ params }: DealDetailPageProps) {
 
             <Button
               variant="outline"
-              className="w-full gap-1.5"
+              className="mt-2 w-full gap-1.5"
               onClick={() => {
                 navigator.clipboard.writeText(window.location.href);
                 toast({ title: "Đã copy link!" });
@@ -334,20 +374,20 @@ export default function DealDetailPage({ params }: DealDetailPageProps) {
           {/* Source */}
           {deal.source && (
             <div className="rounded-xl border border-border bg-card p-5">
-              <p className="text-sm font-semibold mb-1">Nguồn</p>
-              <p className="text-sm text-muted-foreground">
-                {deal.source.name}
+              <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Nguồn
               </p>
+              <p className="text-sm text-foreground">{deal.source.name}</p>
             </div>
           )}
 
           {/* Creator */}
           {deal.creator && (
             <div className="rounded-xl border border-border bg-card p-5">
-              <p className="text-sm font-semibold mb-1">Người đăng</p>
-              <p className="text-sm text-muted-foreground">
-                {deal.creator.fullName}
+              <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Người đăng
               </p>
+              <p className="text-sm text-foreground">{deal.creator.fullName}</p>
             </div>
           )}
         </div>

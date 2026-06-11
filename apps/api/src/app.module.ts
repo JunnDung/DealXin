@@ -9,6 +9,7 @@ import { AppConfigModule } from "./config/config.module";
 import { DealsModule } from "./deals/deals.module";
 import { HealthController } from "./health/health.controller";
 import { PrismaModule } from "./prisma/prisma.module";
+import { IngestionModule } from "./ingestion/ingestion.module";
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { PrismaModule } from "./prisma/prisma.module";
     AuthModule,
     CommonModule,
     DealsModule,
+    IngestionModule,
   ],
   controllers: [HealthController],
   providers: [
