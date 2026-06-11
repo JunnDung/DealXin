@@ -1,0 +1,326 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// Auth & Users
+// ============================================
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      UserRole @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  refreshTokens RefreshToken[]
+  deals        Deal[]       @relation("CreatedDeals")
+  approvedDeals Deal[]      @relation("ApprovedDeals")
+  bookmarks    DealBookmark[]
+  votes       DealVote[]
+  notifications Notification[]
+  auditLogs   AuditLog[]
+  priceHistories PriceHistory[]
+
+  @@index([email])
+  @@index([role])
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  revokedAt DateTime?
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+}
+
+// ============================================
+// Deals Core
+// ============================================
+
+enum DealStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+enum Platform {
+  SHOPEE
+  LAZADA
+  TIKTOK_SHOP
+  OTHER
+}
+
+model DealCategory {
+  id          String @id @default(uuid())
+  name        String @unique
+  slug        String @unique
+  description String?
+  iconUrl     String?
+  sortOrder   Int    @default(0)
+
+  deals Deal[]
+
+  @@index([slug])
+}
+
+model DealSource {
+  id          String @id @default(uuid())
+  name        String @unique
+  slug        String @unique
+  platform    Platform
+  baseUrl     String?
+  isActive    Boolean @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  deals      Deal[]
+  crawlerJobs CrawlerJob[]
+
+  @@index([slug])
+  @@index([platform])
+}
+
+model Deal {
+  id              String     @id @default(uuid())
+  title           String
+  slug            String     @unique
+  description     String?
+  platform        Platform
+  sourceUrl       String?
+  imageUrl        String?
+  originalPrice   Float
+  salePrice       Float
+  discountPercent Int
+  currency        String     @default("VND")
+  status          DealStatus @default(PENDING)
+  score           Int        @default(0)
+  viewCount       Int        @default(0)
+  clickCount      Int        @default(0)
+  expiredAt       DateTime?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  deletedAt       DateTime?
+
+  categoryId String?
+  category   DealCategory? @relation(fields: [categoryId], references: [id])
+
+  sourceId String?
+  source   DealSource? @relation(fields: [sourceId], references: [id])
+
+  createdById String
+  createdBy   User   @relation("CreatedDeals", fields: [createdById], references: [id])
+
+  approvedById String?
+  approvedBy   User?  @relation("ApprovedDeals", fields: [approvedById], references: [id])
+
+  bookmarks  DealBookmark[]
+  votes      DealVote[]
+  priceHistory PriceHistory[]
+
+  @@index([status])
+  @@index([platform])
+  @@index([categoryId])
+  @@index([createdById])
+  @@index([slug])
+  @@index([expiredAt])
+  @@index([score])
+  @@index([createdAt])
+}
+
+model DealVote {
+  id        String   @id @default(uuid())
+  dealId    String
+  deal      Deal    @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  value     Int     // 1 = upvote, -1 = downvote
+  createdAt DateTime @default(now())
+
+  @@unique([dealId, userId])
+  @@index([dealId])
+  @@index([userId])
+}
+
+model DealBookmark {
+  id        String   @id @default(uuid())
+  dealId    String
+  deal      Deal    @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([dealId, userId])
+  @@index([dealId])
+  @@index([userId])
+}
+
+model PriceHistory {
+  id        String   @id @default(uuid())
+  dealId    String
+  deal      Deal    @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  price     Float
+  recordedAt DateTime @default(now())
+  recordedById String?
+  recordedBy   User?  @relation(fields: [recordedById], references: [id])
+
+  @@index([dealId])
+  @@index([recordedAt])
+}
+
+model Voucher {
+  id          String   @id @default(uuid())
+  code        String   @unique
+  description String?
+  discount    Float
+  discountType String  @default("PERCENT") // PERCENT or FIXED
+  minOrderValue Float?
+  maxDiscount  Float?
+  platform    Platform
+  sourceUrl   String?
+  expiredAt   DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  isActive   Boolean  @default(true)
+
+  @@index([expiredAt])
+  @@index([platform])
+}
+
+// ============================================
+// Ingestion
+// ============================================
+
+enum CrawlerJobStatus {
+  QUEUED
+  RUNNING
+  SUCCESS
+  FAILED
+}
+
+model CrawlerJob {
+  id          String           @id @default(uuid())
+  sourceId    String
+  source      DealSource      @relation(fields: [sourceId], references: [id])
+  status      CrawlerJobStatus @default(QUEUED)
+  startedAt   DateTime?
+  completedAt DateTime?
+  itemsFound  Int             @default(0)
+  itemsImported Int            @default(0)
+  errorMessage String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@index([sourceId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// ============================================
+// Event Outbox
+// ============================================
+
+model OutboxEvent {
+  id          String   @id @default(uuid())
+  aggregateType String // e.g. "Deal", "Notification"
+  aggregateId   String
+  eventType   String
+  payload     String   // JSON stringified event
+  published   Boolean  @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+
+  @@index([published])
+  @@index([aggregateType, aggregateId])
+  @@index([createdAt])
+}
+
+// ============================================
+// Notifications
+// ============================================
+
+enum NotificationType {
+  DEAL_APPROVED
+  DEAL_REJECTED
+  DEAL_EXPIRING
+  PRICE_DROPPED
+  VOUCHER_EXPIRING
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  title     String
+  body      String
+  isRead    Boolean          @default(false)
+  dealId    String?
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  @@index([userId, isRead])
+  @@index([userId, createdAt])
+  @@index([dealId])
+}
+
+// ============================================
+// Analytics
+// ============================================
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+  action     String   // e.g. "DealApproved", "UserRoleChanged"
+  entityType String?  // e.g. "Deal", "User"
+  entityId  String?
+  metadata   String?  // JSON stringified extra data
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}
+
+// ============================================
+// Search Indexing
+// ============================================
+
+model SearchIndexJob {
+  id         String   @id @default(uuid())
+  entityType String   // "Deal", "Voucher"
+  entityId  String
+  action    String   // "INDEX", "DELETE"
+  status     String   @default("PENDING")
+  attempts   Int      @default(0)
+  error      String?
+  createdAt  DateTime @default(now())
+  processedAt DateTime?
+
+  @@index([status])
+  @@index([entityType, entityId])
+}
