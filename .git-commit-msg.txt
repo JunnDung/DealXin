@@ -1,0 +1,12 @@
+chore: scaffold monorepo
+
+- Initialize pnpm workspaces monorepo with 7 packages
+- Create apps/web (Next.js 15 + Tailwind + shadcn/ui)
+- Create apps/api (NestJS 10) with Swagger, error filter, logger
+- Create packages/shared (env, errors, utils)
+- Create packages/contracts (event contracts, DTOs)
+- Create packages/eslint-config, packages/typescript-config
+- Add docker-compose.yml (postgres, redis, rabbitmq, meilisearch)
+- Add GitHub Actions CI (lint, typecheck, test, build)
+- Add .env.example with all required variables
+- Build passes for both apps

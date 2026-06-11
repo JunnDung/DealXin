@@ -1,0 +1,111 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-and-typecheck:
+    name: Lint & Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - run: pnpm install --frozen-lockfile
+        env:
+          SKIP_GITHUB_ACTIONS_AUTH: 'true'
+
+      - name: Typecheck all packages
+        run: pnpm typecheck
+
+      - name: Lint all packages
+        run: pnpm lint
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: dealxin
+          POSTGRES_PASSWORD: dealxin_secret
+          POSTGRES_DB: dealxin
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - run: pnpm install --frozen-lockfile
+        env:
+          SKIP_GITHUB_ACTIONS_AUTH: 'true'
+
+      - name: Generate Prisma Client
+        run: pnpm --filter api prisma generate
+        env:
+          DATABASE_URL: postgresql://dealxin:dealxin_secret@localhost:5432/dealxin
+
+      - name: Run tests
+        run: pnpm test
+        env:
+          DATABASE_URL: postgresql://dealxin:dealxin_secret@localhost:5432/dealxin
+          REDIS_URL: redis://localhost:6379
+          NODE_ENV: test
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [lint-and-typecheck, test]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - run: pnpm install --frozen-lockfile
+        env:
+          SKIP_GITHUB_ACTIONS_AUTH: 'true'
+
+      - name: Build all apps
+        run: pnpm build

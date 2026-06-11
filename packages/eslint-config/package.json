@@ -1,0 +1,25 @@
+{
+  "name": "@dealxin/eslint-config",
+  "version": "0.1.0",
+  "private": true,
+  "exports": {
+    "./next.js": "./next.js",
+    "./nestjs.js": "./nestjs.js",
+    "./base.js": "./base.js"
+  },
+  "dependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^10.0.0",
+    "eslint-plugin-import": "^2.30.0",
+    "eslint-plugin-jsx-a11y": "^6.10.0",
+    "eslint-plugin-prettier": "^5.2.0",
+    "eslint-plugin-react": "^4.0.0",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-simple-import-sort": "^12.0.0",
+    "eslint-plugin-unicorn": "^56.0.0",
+    "eslint-plugin-no-only-tests": "^3.0.0",
+    "prettier": "^3.4.0"
+  }
+}

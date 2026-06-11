@@ -1,0 +1,36 @@
+{
+  "name": "dealxin",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.0.0",
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=10.0.0"
+  },
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "dev:web": "pnpm --filter web dev",
+    "dev:api": "pnpm --filter api dev",
+    "build": "pnpm -r build",
+    "build:web": "pnpm --filter web build",
+    "build:api": "pnpm --filter api build",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "test:e2e": "pnpm --filter web test:e2e",
+    "clean": "pnpm -r clean && rm -rf node_modules",
+    "format": "pnpm -r format",
+    "db:migrate:dev": "pnpm --filter api db:migrate:dev",
+    "db:push:dev": "pnpm --filter api db:push:dev",
+    "db:studio": "pnpm --filter api db:studio",
+    "db:seed": "pnpm --filter api db:seed",
+    "docker:up": "docker compose -f docker-compose.yml up -d",
+    "docker:down": "docker compose -f docker-compose.yml down"
+  },
+  "devDependencies": {
+    "@dealxin/eslint-config": "workspace:*",
+    "@dealxin/typescript-config": "workspace:*",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.8.0"
+  }
+}
