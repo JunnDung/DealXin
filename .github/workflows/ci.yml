@@ -28,6 +28,9 @@ jobs:
         env:
           SKIP_GITHUB_ACTIONS_AUTH: 'true'
 
+      - run: node scripts/postinstall-patch-prisma.js
+        name: Patch Prisma client re-exports
+
       - name: Generate Prisma Client
         run: pnpm --filter api prisma generate
 
@@ -74,6 +77,9 @@ jobs:
         env:
           SKIP_GITHUB_ACTIONS_AUTH: 'true'
 
+      - run: node scripts/postinstall-patch-prisma.js
+        name: Patch Prisma client re-exports
+
       - name: Generate Prisma Client
         run: pnpm --filter api prisma generate
         env:
@@ -105,6 +111,9 @@ jobs:
       - run: pnpm install --frozen-lockfile
         env:
           SKIP_GITHUB_ACTIONS_AUTH: 'true'
+
+      - run: node scripts/postinstall-patch-prisma.js
+        name: Patch Prisma client re-exports
 
       - name: Generate Prisma Client
         run: pnpm --filter api prisma generate

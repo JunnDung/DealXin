@@ -10,6 +10,7 @@ module.exports = {
   testEnvironment: 'node',
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/../$1',
+    '^@prisma/client$': '<rootDir>/../../node_modules/.prisma/client/default',
   },
   setupFilesAfterEnv: ['<rootDir>/../test/setup.ts'],
 };
