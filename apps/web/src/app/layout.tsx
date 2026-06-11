@@ -1,9 +1,22 @@
 import "./globals.css";
 
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Be_Vietnam_Pro, Plus_Jakarta_Sans } from "next/font/google";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+import { Providers } from "@/components/providers";
+import { Toaster } from "@/components/ui/toaster";
+
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  variable: "--font-jakarta",
+  weight: ["400", "500", "600", "700", "800"],
+});
+
+const beVietnam = Be_Vietnam_Pro({
+  subsets: ["latin"],
+  variable: "--font-vietnam",
+  weight: ["400", "500", "600", "700"],
+});
 
 export const metadata: Metadata = {
   title: {
@@ -30,8 +43,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="vi" suppressHydrationWarning>
-      <body className={`${inter.variable} font-sans antialiased`}>
-        {children}
+      <body
+        className={`${jakarta.variable} ${beVietnam.variable} font-sans antialiased`}
+      >
+        <Providers>{children}</Providers>
+        <Toaster />
       </body>
     </html>
   );

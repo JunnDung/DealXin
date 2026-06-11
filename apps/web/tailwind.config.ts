@@ -10,6 +10,16 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: [
+          "var(--font-jakarta)",
+          "var(--font-vietnam)",
+          "system-ui",
+          "sans-serif",
+        ],
+        display: ["var(--font-jakarta)", "system-ui", "sans-serif"],
+        vietnam: ["var(--font-vietnam)", "system-ui", "sans-serif"],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

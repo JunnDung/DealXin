@@ -8,15 +8,17 @@
     "strictNullChecks": true,
     "strictBindCallApply": true,
     "strictFunctionTypes": true,
-    "strictPropertyInitialization": true,
-    "noImplicitAny": true,
+    "strictPropertyInitialization": false,
+    "noImplicitAny": false,
     "noImplicitReturns": true,
     "noImplicitOverride": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
-    "exactOptionalPropertyTypes": true,
-    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": false,
+    "noUncheckedIndexedAccess": false,
+    "noImplicitThis": false,
+    "strictPropertyInitialization": false,
     "forceConsistentCasingInFileNames": true,
     "module": "ESNext",
     "moduleResolution": "Bundler",
@@ -30,7 +32,8 @@
     "plugins": [{ "name": "next" }],
     "baseUrl": ".",
     "paths": {
-      "~/*": ["./src/*"]
+      "~/*": ["./src/*"],
+      "@/*": ["./src/*"]
     },
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json"
   },

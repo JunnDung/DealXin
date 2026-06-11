@@ -12,6 +12,7 @@
 | Phase 1 | Monorepo Scaffold | ✓ Done |
 | Phase 2 | Database & Auth | ✓ Done |
 | Phase 3 | Deals Core | ✓ Done |
+| Phase 4 | Frontend MVP | ✓ Done |
 
 Đang xây dựng theo từng phase. Xem [docs/roadmap.md](docs/roadmap.md) để biết tiến độ.
 
@@ -80,7 +81,7 @@ packages/
 | 1 | Monorepo Scaffold | ✓ Done |
 | 2 | Database & Auth | ✓ Done |
 | 3 | Deals Core | ✓ Done |
-| 4 | Frontend MVP | Pending |
+| 4 | Frontend MVP | ✓ Done |
 | 5 | Ingestion & Adapters | Pending |
 | 6 | Event-Driven & Microservices | Pending |
 | 7 | Search | Pending |
