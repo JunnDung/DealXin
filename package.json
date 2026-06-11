@@ -25,7 +25,8 @@
     "db:studio": "pnpm --filter api db:studio",
     "db:seed": "pnpm --filter api db:seed",
     "docker:up": "docker compose -f docker-compose.yml up -d",
-    "docker:down": "docker compose -f docker-compose.yml down"
+    "docker:down": "docker compose -f docker-compose.yml down",
+    "postinstall": "node scripts/postinstall-patch-prisma.js"
   },
   "devDependencies": {
     "@dealxin/eslint-config": "workspace:*",

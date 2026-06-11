@@ -6,6 +6,7 @@ import { AuthService } from "./auth.service";
 const mockPrisma = {
   user: {
     findUnique: jest.fn(),
+    findFirst: jest.fn(),
     create: jest.fn(),
   },
   refreshToken: {
@@ -156,6 +157,79 @@ describe("AuthService", () => {
         where: { userId: "user-uuid", revokedAt: null },
         data: { revokedAt: expect.any(Date) },
       });
+    });
+  });
+
+  describe("refresh", () => {
+    const validToken = "valid-refresh-token";
+    const futureDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+    it("should return new tokens for a valid refresh token", async () => {
+      mockPrisma.refreshToken.findUnique.mockResolvedValue({
+        id: "token-id",
+        token: validToken,
+        userId: "user-uuid",
+        expiresAt: futureDate,
+        revokedAt: null,
+        user: {
+          id: "user-uuid",
+          email: "user@email.com",
+          name: "User",
+          role: "USER",
+          createdAt: new Date(),
+          password: "hashed",
+        },
+      });
+      mockPrisma.refreshToken.update.mockResolvedValue({});
+      mockPrisma.refreshToken.create.mockResolvedValue({});
+
+      const service = createService();
+      const result = await service.refresh(validToken);
+
+      expect(result.accessToken).toBe("mock-jwt-token");
+      expect(result.refreshToken).toBeDefined();
+      expect(result.user.email).toBe("user@email.com");
+    });
+
+    it("should throw UnauthorizedException for non-existent token", async () => {
+      mockPrisma.refreshToken.findUnique.mockResolvedValue(null);
+
+      const service = createService();
+      await expect(service.refresh("nonexistent-token")).rejects.toThrow(
+        UnauthorizedException,
+      );
+    });
+
+    it("should throw UnauthorizedException for revoked token", async () => {
+      mockPrisma.refreshToken.findUnique.mockResolvedValue({
+        id: "token-id",
+        token: validToken,
+        userId: "user-uuid",
+        expiresAt: futureDate,
+        revokedAt: new Date(),
+        user: {} as never,
+      });
+
+      const service = createService();
+      await expect(service.refresh(validToken)).rejects.toThrow(
+        UnauthorizedException,
+      );
+    });
+
+    it("should throw UnauthorizedException for expired token", async () => {
+      mockPrisma.refreshToken.findUnique.mockResolvedValue({
+        id: "token-id",
+        token: validToken,
+        userId: "user-uuid",
+        expiresAt: new Date(Date.now() - 1000),
+        revokedAt: null,
+        user: {} as never,
+      });
+
+      const service = createService();
+      await expect(service.refresh(validToken)).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
   });
 });

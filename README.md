@@ -1,6 +1,6 @@
 # DealXin — Real-time Deal Aggregator Platform
 
-[![CI](https://github.com/yourusername/dealxin/actions/workflows/ci.yml/badge.svg)](https://github.com/yourusername/dealxin/actions/workflows/ci.yml)
+[![CI](https://github.com/JunnDung/DealXin/actions/workflows/ci.yml/badge.svg)](https://github.com/JunnDung/DealXin/actions/workflows/ci.yml)
 
 > Một nền tảng full-stack để tổng hợp deal, voucher, flash sale và ưu đãi thương mại điện tử Việt Nam.
 
@@ -11,7 +11,7 @@
 | Phase 0 | Audit & Planning | ✓ Done |
 | Phase 1 | Monorepo Scaffold | ✓ Done |
 | Phase 2 | Database & Auth | ✓ Done |
-| Phase 3 | Deals Core | Pending |
+| Phase 3 | Deals Core | ✓ Done |
 
 Đang xây dựng theo từng phase. Xem [docs/roadmap.md](docs/roadmap.md) để biết tiến độ.
 
@@ -19,7 +19,7 @@
 
 ```bash
 # Clone repo
-git clone https://github.com/yourusername/dealxin.git
+git clone https://github.com/JunnDung/DealXin.git
 cd dealxin
 
 # Install dependencies (requires pnpm >= 9.0.0)
@@ -79,7 +79,7 @@ packages/
 | 0 | Audit & Planning | ✓ Done |
 | 1 | Monorepo Scaffold | ✓ Done |
 | 2 | Database & Auth | ✓ Done |
-| 3 | Deals Core | Pending |
+| 3 | Deals Core | ✓ Done |
 | 4 | Frontend MVP | Pending |
 | 5 | Ingestion & Adapters | Pending |
 | 6 | Event-Driven & Microservices | Pending |
@@ -99,6 +99,7 @@ packages/
 - [Search Engine ADR](docs/adr/0004-search-engine-choice.md)
 - [Package Manager ADR](docs/adr/0005-package-manager.md)
 - [Database ERD](docs/database-erd.md)
+- [API Docs](docs/api-docs.md)
 
 ## Environment Variables
 

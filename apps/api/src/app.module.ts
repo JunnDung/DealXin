@@ -6,6 +6,7 @@ import { AuthModule } from "./auth/auth.module";
 import { JwtAuthGuard } from "./auth/guards/jwt-auth.guard";
 import { CommonModule } from "./common/common.module";
 import { AppConfigModule } from "./config/config.module";
+import { DealsModule } from "./deals/deals.module";
 import { HealthController } from "./health/health.controller";
 import { PrismaModule } from "./prisma/prisma.module";
 
@@ -19,6 +20,7 @@ import { PrismaModule } from "./prisma/prisma.module";
     PrismaModule,
     AuthModule,
     CommonModule,
+    DealsModule,
   ],
   controllers: [HealthController],
   providers: [
