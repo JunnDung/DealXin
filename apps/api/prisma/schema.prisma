@@ -35,6 +35,7 @@ model User {
   notifications Notification[]
   auditLogs   AuditLog[]
   priceHistories PriceHistory[]
+  analyticsEvents AnalyticsEvent[]
 
   @@index([email])
   @@index([role])
@@ -141,6 +142,7 @@ model Deal {
   bookmarks  DealBookmark[]
   votes      DealVote[]
   priceHistory PriceHistory[]
+  analyticsEvents AnalyticsEvent[]
 
   @@index([status])
   @@index([platform])
@@ -327,4 +329,38 @@ model SearchIndexJob {
 
   @@index([status])
   @@index([entityType, entityId])
+}
+
+// ============================================
+// Analytics
+// ============================================
+
+enum AnalyticsEventType {
+  PAGE_VIEW
+  DEAL_UPVOTE
+  DEAL_DOWNVOTE
+  DEAL_BOOKMARK
+  DEAL_SHARE
+  SEARCH_QUERY
+  DEAL_SUBMITTED
+  DEAL_APPROVED
+  DEAL_REJECTED
+}
+
+model AnalyticsEvent {
+  id        String   @id @default(cuid())
+  type      AnalyticsEventType
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  dealId    String?
+  deal      Deal?    @relation(fields: [dealId], references: [id], onDelete: SetNull)
+  metadata  Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([type])
+  @@index([userId])
+  @@index([dealId])
+  @@index([createdAt])
 }

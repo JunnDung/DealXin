@@ -1,7 +1,7 @@
 # DealXin — Roadmap
 
-> Last updated: 2026-06-11
-> Status: Phase 5 — Ingestion & Adapters ✓ | Phase 6 — Event-Driven
+> Last updated: 2026-06-12
+> Status: Phase 12 — Recruiter Polish
 
 ---
 
@@ -72,45 +72,45 @@ dealxin/
 - [x] Tool/middleware inventory
 - [x] Tech stack validation via Context7
 - [x] Architecture decision proposals
-- [ ] ADR documents
-- [ ] Repo structure proposal
-- [ ] AgentMemory save
+- [x] ADR documents
+- [x] Repo structure proposal
+- [x] AgentMemory save
 
 ### Phase 1 — Monorepo Scaffold
-- [ ] Initialize pnpm monorepo
-- [ ] Create `apps/web` (Next.js + TypeScript + Tailwind + shadcn/ui)
-- [ ] Create `apps/api` (NestJS + TypeScript)
-- [ ] Create `packages/shared`, `packages/contracts`, `packages/config`
-- [ ] TypeScript strict config
-- [ ] ESLint + Prettier
-- [ ] `.env.example`
-- [ ] Docker Compose (postgres, redis, rabbitmq, meilisearch)
-- [ ] README v0.1
-- [ ] CI pipeline (lint, typecheck, test, build)
+- [x] Initialize pnpm monorepo
+- [x] Create `apps/web` (Next.js + TypeScript + Tailwind + shadcn/ui)
+- [x] Create `apps/api` (NestJS + TypeScript)
+- [x] Create `packages/shared`, `packages/contracts`, `packages/config`
+- [x] TypeScript strict config
+- [x] ESLint + Prettier
+- [x] `.env.example`
+- [x] Docker Compose (postgres, redis, rabbitmq, meilisearch)
+- [x] README v0.1
+- [x] CI pipeline (lint, typecheck, test, build)
 
 ### Phase 2 — Database and Auth
-- [ ] Prisma schema design
-- [ ] Migration
-- [ ] Seed data (admin, users, categories, sources, sample deals)
-- [ ] Auth: register, login, refresh token, logout, /me
-- [ ] RBAC: USER, ADMIN
-- [ ] Unit + integration tests for auth
-- [ ] `docs/database-erd.md` update
-- [ ] `docs/api-docs.md` update
+- [x] Prisma schema design
+- [x] Migration
+- [x] Seed data (admin, users, categories, sources, sample deals)
+- [x] Auth: register, login, refresh token, logout, /me
+- [x] RBAC: USER, ADMIN
+- [x] Unit + integration tests for auth
+- [x] `docs/database-erd.md` update
+- [x] `docs/api-docs.md` update
 
 ### Phase 3 — Deals Core
-- [ ] Deal CRUD
-- [ ] User submit deal
-- [ ] Admin approve/reject/expire
-- [ ] Deal status transition validation
-- [ ] Vote deal
-- [ ] Bookmark deal
-- [ ] Price history tracking
-- [ ] Deal scoring strategy
-- [ ] Repository, Strategy, State machine patterns
-- [ ] AuditLog
-- [ ] Swagger/OpenAPI docs
-- [ ] Unit + integration tests
+- [x] Deal CRUD
+- [x] User submit deal
+- [x] Admin approve/reject/expire
+- [x] Deal status transition validation
+- [x] Vote deal
+- [x] Bookmark deal
+- [x] Price history tracking
+- [x] Deal scoring strategy
+- [x] Repository, Strategy, State machine patterns
+- [x] AuditLog
+- [x] Swagger/OpenAPI docs
+- [x] Unit + integration tests
 
 ### Phase 4 — Frontend MVP
 - [x] Landing page (taste-skill direction, hallmark audit)
@@ -123,8 +123,8 @@ dealxin/
 - [x] TanStack Query integration
 - [x] Hallmark UI audit (13 issues fixed)
 - [x] Playwright smoke tests (8/8 passing)
-- [ ] Loading / error / empty states
-- [ ] Responsive mobile layout
+- [x] Loading / error / empty states
+- [x] Responsive mobile layout
 
 ### Phase 5 — Ingestion and Adapters
 - [x] Ingestion module (controller + service)
@@ -140,57 +140,57 @@ dealxin/
 - [x] API endpoints: import/json, import/csv, crawl/:sourceType, jobs, jobs/:id
 
 ### Phase 6 — Event-Driven and Microservices-Ready
-- [ ] RabbitMQ integration
-- [ ] OutboxEvent model
-- [ ] DealApproved/Rejected/Expired events
-- [ ] Outbox worker (publisher)
-- [ ] Search consumer (index to Meilisearch)
-- [ ] Notification consumer
-- [ ] Analytics consumer
-- [ ] CQRS light (read vs write separation)
-- [ ] `docs/event-contracts.md`
+- [x] RabbitMQ integration (MessagingModule with amqp-connection-manager)
+- [x] OutboxEvent model (already in schema)
+- [x] OutboxService + OutboxPublisherService (polling worker)
+- [x] DealApproved/Rejected/Expired/Submitted events emitted from DealsService
+- [x] Outbox worker (publisher) — at-least-once delivery guarantee
+- [x] Search consumer (search.index queue, logs events — Meilisearch in Phase 7)
+- [x] Notification consumer (notification.send queue — creates in-app notifications)
+- [x] CQRS light (write via OutboxService, async processing via consumers)
+- [x] `docs/event-contracts.md`
 
 ### Phase 7 — Search
-- [ ] Meilisearch setup
-- [ ] Index approved deals
-- [ ] Search endpoint (full-text, filters, sort)
-- [ ] Frontend search page
-- [ ] Reindex script
-- [ ] Search suggestions
+- [x] Meilisearch setup
+- [x] Index approved deals
+- [x] Search endpoint (full-text, filters, sort)
+- [x] Frontend search page
+- [x] Reindex script
+- [x] Search suggestions
 
 ### Phase 8 — Notification and Realtime
-- [ ] In-app notification model
-- [ ] Notification list
-- [ ] Mark as read
-- [ ] SSE or WebSocket
-- [ ] Notification on deal approved
-- [ ] Price drop alert (mock)
+- [x] In-app notification model
+- [x] Notification list
+- [x] Mark as read
+- [x] SSE or WebSocket
+- [x] Notification on deal approved
+- [x] Price drop alert (mock)
 - [ ] E2E test
 
 ### Phase 9 — Analytics and Admin Polish
-- [ ] DealViewed tracking
-- [ ] DealClicked tracking
-- [ ] Hot deal ranking
-- [ ] Admin analytics charts
-- [ ] Audit logs UI
-- [ ] Source performance metrics
+- [x] DealViewed tracking
+- [x] DealClicked tracking
+- [x] Hot deal ranking
+- [x] Admin analytics charts
+- [x] Audit logs UI
+- [x] Source performance metrics
 
 ### Phase 10 — Observability and CI/CD
-- [ ] Structured logging (Pino)
-- [ ] Request ID / Correlation ID
-- [ ] Health checks
-- [ ] OpenTelemetry setup (if feasible)
-- [ ] GitHub Actions: lint → typecheck → test → build
-- [ ] Docker healthcheck
+- [x] Structured logging (Pino)
+- [x] Request ID / Correlation ID
+- [x] Health checks
+- [x] OpenTelemetry setup (if feasible)
+- [x] GitHub Actions: lint → typecheck → test → build
+- [x] Docker healthcheck
 - [ ] `docs/testing.md` and `docs/deployment.md`
 
 ### Phase 11 — Deployment
-- [ ] Deploy frontend to Vercel
-- [ ] Backend deploy guide (Render/Fly.io/Railway/VPS)
-- [ ] Env vars configuration
-- [ ] Fix build errors
+- [x] Deploy frontend to Vercel
+- [x] Backend deploy guide (Render/Fly.io/Railway/VPS)
+- [x] Env vars configuration
+- [x] Fix build errors
 - [ ] Update README with demo link
-- [ ] Deployment docs
+- [x] Deployment docs
 
 ### Phase 12 — Recruiter Polish
 - [ ] Hallmark UI audit + polish

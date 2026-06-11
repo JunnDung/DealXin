@@ -1,6 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
 import { MessagingService } from "../messaging.service";
 import { Queues } from "../routing-keys";
+import { MeilisearchService, DealDocument } from "../../search/meilisearch.service";
 
 @Injectable()
 export class SearchConsumer implements OnModuleInit {
@@ -8,32 +9,106 @@ export class SearchConsumer implements OnModuleInit {
 
   constructor(
     private readonly messagingService: MessagingService,
+    private readonly meilisearchService: MeilisearchService,
   ) {}
 
   async onModuleInit() {
-    // NOTE: Meilisearch client not yet set up
-    // This consumer logs the intent and processes events
-    // Full Meilisearch integration in Phase 7
-    
     await this.messagingService.subscribe(
       Queues.SEARCH_INDEX,
       async (msg: unknown) => {
         await this.handleSearchIndex(msg);
       },
     );
-    
-    this.logger.log("Search consumer started (Meilisearch integration in Phase 7)");
+
+    this.logger.log("Search consumer started");
   }
 
   private async handleSearchIndex(msg: unknown) {
-    const event = msg as Record<string, unknown>;
-    this.logger.log(`Search indexing event: ${event["eventType"]}`);
-    
-    // In Phase 7, this will call Meilisearch to index the deal
-    // For now, log the deal data that would be indexed
-    if (event["payload"]) {
-      const payload = event["payload"] as Record<string, unknown>;
-      this.logger.debug(`Would index deal: ${payload["title"]} (${payload["dealId"]})`);
+    const event = msg as {
+      eventType?: string;
+      dealId?: string;
+      payload?: Record<string, unknown>;
+    };
+
+    const eventType = event.eventType ?? "";
+    const dealId =
+      event.dealId ??
+      (event.payload?.["id"] as string | undefined);
+
+    this.logger.debug(`Search index event: ${eventType}, dealId: ${dealId}`);
+
+    try {
+      switch (eventType) {
+        case "DEAL_APPROVED":
+        case "deal.approved":
+          await this.indexDeal(event.payload ?? {});
+          break;
+
+        case "DEAL_REJECTED":
+        case "deal.rejected":
+          if (dealId) {
+            await this.removeDeal(dealId);
+          }
+          break;
+
+        case "DEAL_EXPIRED":
+        case "deal.expired":
+          if (dealId) {
+            await this.removeDeal(dealId);
+          }
+          break;
+
+        case "DEAL_SUBMITTED":
+        case "deal.submitted":
+          this.logger.debug(
+            "DealSubmitted event received — no indexing action for pending deal",
+          );
+          break;
+
+        default:
+          this.logger.warn(`Unknown search event type: ${eventType}`);
+      }
+    } catch (error) {
+      this.logger.error(
+        `Failed to handle search index event ${eventType}: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+      throw error;
     }
+  }
+
+  private async indexDeal(payload: Record<string, unknown>) {
+    const document: DealDocument = {
+      id: payload["id"] as string,
+      title: payload["title"] as string,
+      description: (payload["description"] as string) ?? "",
+      slug: (payload["slug"] as string) ?? "",
+      platform: payload["platform"] as string,
+      categoryId: (payload["categoryId"] as string) ?? "",
+      categoryName: (payload["categoryName"] as string) ?? "",
+      salePrice: payload["salePrice"] as number,
+      originalPrice: payload["originalPrice"] as number,
+      discountPercent: payload["discountPercent"] as number,
+      imageUrl: (payload["imageUrl"] as string) ?? "",
+      sourceUrl: (payload["dealUrl"] as string) ?? "",
+      score: (payload["score"] as number) ?? 0,
+      viewCount: (payload["viewCount"] as number) ?? 0,
+      upvoteCount:
+        (payload["upvoteCount"] as number) ??
+        (payload["upvotes"] as number) ??
+        0,
+      status: payload["status"] as string,
+      expiredAt: (payload["expiredAt"] as string | undefined) ?? null,
+      createdAt: payload["createdAt"] as string,
+    };
+
+    await this.meilisearchService.indexDeal(document);
+    this.logger.log(`Indexed deal: ${document.id} (${document.title})`);
+  }
+
+  private async removeDeal(dealId: string) {
+    await this.meilisearchService.removeDeal(dealId);
+    this.logger.log(`Removed deal from index: ${dealId}`);
   }
 }

@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 test.describe("DealXin Smoke Tests", () => {
   test("home page loads without errors", async ({ page }) => {
@@ -9,7 +9,9 @@ test.describe("DealXin Smoke Tests", () => {
 
   test("navigation header is visible", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByRole("banner").getByRole("link", { name: /DealXin/i })).toBeVisible();
+    await expect(
+      page.getByRole("banner").getByRole("link", { name: /DealXin/i }),
+    ).toBeVisible();
   });
 
   test("deals page loads", async ({ page }) => {
@@ -19,14 +21,18 @@ test.describe("DealXin Smoke Tests", () => {
 
   test("login page loads", async ({ page }) => {
     await page.goto("/auth/login");
-    await expect(page.getByRole("heading", { name: "Đăng nhập" })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "Đăng nhập" }),
+    ).toBeVisible();
     await expect(page.getByLabel(/email/i)).toBeVisible();
     await expect(page.getByLabel(/mật khẩu/i)).toBeVisible();
   });
 
   test("register page loads", async ({ page }) => {
     await page.goto("/auth/register");
-    await expect(page.getByRole("heading", { name: /tạo tài khoản/i })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /tạo tài khoản/i }),
+    ).toBeVisible();
   });
 
   test("login form validates required fields", async ({ page }) => {

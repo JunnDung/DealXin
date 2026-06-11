@@ -7,6 +7,7 @@ export const RoutingKeys = {
   DEAL_BOOKMARKED: "deal.bookmarked",
   PRICE_CHANGED: "deal.price_changed",
   NOTIFICATION_REQUESTED: "notification.requested",
+  ANALYTICS: "analytics.#",
 } as const;
 
 export const Exchanges = {

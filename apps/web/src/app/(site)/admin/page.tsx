@@ -13,6 +13,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import {
+  Activity,
   CheckCircle,
   ChevronLeft,
   ChevronRight,
@@ -20,6 +21,7 @@ import {
   ExternalLink,
   MoreHorizontal,
   Search,
+  Server,
   Shield,
   Tag,
   XCircle,
@@ -251,14 +253,41 @@ export default function AdminPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Header */}
-      <div className="mb-6 flex items-center gap-3">
-        <Shield className="h-7 w-7 text-primary" />
-        <div>
-          <h1 className="font-jakarta text-2xl font-bold">Quản trị</h1>
-          <p className="text-sm text-muted-foreground">
-            Quản lý deals chờ duyệt và nội dung
-          </p>
+      <div className="mb-6 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Shield className="h-7 w-7 text-primary" />
+          <div>
+            <h1 className="font-jakarta text-2xl font-bold">Quản trị</h1>
+            <p className="text-sm text-muted-foreground">
+              Quản lý deals chờ duyệt và nội dung
+            </p>
+          </div>
         </div>
+      </div>
+
+      {/* Navigation Tabs */}
+      <div className="mb-6 flex items-center gap-1 border-b">
+        <Link
+          href="/admin"
+          className="flex items-center gap-2 border-b-2 border-saffron px-4 py-2 text-sm font-medium text-foreground"
+        >
+          <Tag className="h-4 w-4" />
+          Deals
+        </Link>
+        <Link
+          href="/admin/analytics"
+          className="flex items-center gap-2 border-b-2 border-transparent px-4 py-2 text-sm font-medium text-muted-foreground hover:border-saffron/50 hover:text-foreground transition-colors"
+        >
+          <Activity className="h-4 w-4" />
+          Analytics
+        </Link>
+        <Link
+          href="/admin/status"
+          className="flex items-center gap-2 border-b-2 border-transparent px-4 py-2 text-sm font-medium text-muted-foreground hover:border-saffron/50 hover:text-foreground transition-colors"
+        >
+          <Server className="h-4 w-4" />
+          Status
+        </Link>
       </div>
 
       {/* Stats */}

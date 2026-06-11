@@ -23,6 +23,8 @@ import {
   type DealStatusTransitionStrategy,
   DefaultDealScoringStrategy,
 } from "./strategies";
+import { MessagingService } from "../messaging/messaging.service";
+import { Queues } from "../messaging/routing-keys";
 
 function slugify(text: string): string {
   return text
@@ -48,6 +50,7 @@ export class DealsService {
     private readonly repository: DealRepository,
     private readonly statusTransition: DealStatusTransitionStrategy,
     private readonly outbox: OutboxService,
+    private readonly messagingService: MessagingService,
   ) {}
 
   async createDeal(
@@ -98,6 +101,13 @@ export class DealsService {
         sourceUrl: deal.sourceUrl ?? "",
         createdById: deal.createdById,
       },
+    });
+
+    await this.messagingService.publish(Queues.ANALYTICS, {
+      eventType: "DEAL_SUBMITTED",
+      dealId: deal.id,
+      userId,
+      metadata: { title: deal.title, platform: deal.platform },
     });
 
     return this.toResponseDto(deal);
@@ -170,6 +180,13 @@ export class DealsService {
 
     await this.repository.incrementViewCount(id);
 
+    await this.messagingService.publish(Queues.ANALYTICS, {
+      eventType: "PAGE_VIEW",
+      dealId: deal.id,
+      userId,
+      metadata: { slug: deal.slug },
+    });
+
     let isBookmarked: boolean | undefined;
     let userVote: number | undefined;
     if (userId) {
@@ -199,6 +216,13 @@ export class DealsService {
     }
 
     await this.repository.incrementViewCount(deal.id);
+
+    await this.messagingService.publish(Queues.ANALYTICS, {
+      eventType: "PAGE_VIEW",
+      dealId: deal.id,
+      userId,
+      metadata: { slug: deal.slug },
+    });
 
     let isBookmarked: boolean | undefined;
     let userVote: number | undefined;
@@ -305,6 +329,13 @@ export class DealsService {
       },
     });
 
+    await this.messagingService.publish(Queues.ANALYTICS, {
+      eventType: "DEAL_APPROVED",
+      dealId: deal.id,
+      userId: adminId,
+      metadata: { title: deal.title, score: deal.score },
+    });
+
     return this.toResponseDto(deal);
   }
 
@@ -358,6 +389,13 @@ export class DealsService {
         rejectedById: adminId,
         reason: reason ?? undefined,
       },
+    });
+
+    await this.messagingService.publish(Queues.ANALYTICS, {
+      eventType: "DEAL_REJECTED",
+      dealId: deal.id,
+      userId: adminId,
+      metadata: { title: deal.title, reason },
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -444,6 +482,13 @@ export class DealsService {
       metadata: { value },
     });
 
+    await this.messagingService.publish(Queues.ANALYTICS, {
+      eventType: value === 1 ? "DEAL_UPVOTE" : "DEAL_DOWNVOTE",
+      dealId,
+      userId,
+      metadata: { score },
+    });
+
     return { vote: value, score };
   }
 
@@ -484,6 +529,13 @@ export class DealsService {
       action: "DealBookmarked",
       entityType: "Deal",
       entityId: dealId,
+    });
+
+    await this.messagingService.publish(Queues.ANALYTICS, {
+      eventType: "DEAL_BOOKMARK",
+      dealId,
+      userId,
+      metadata: { title: (deal as Deal).title },
     });
 
     return { bookmarked: true };

@@ -2,10 +2,13 @@
 
 import { useQuery } from "@tanstack/react-query";
 import {
+  AlertCircle,
   ArrowRight,
   Bookmark,
+  Compass,
   LayoutDashboard,
   PlusCircle,
+  RefreshCw,
   Tag,
   TrendingUp,
 } from "lucide-react";
@@ -36,7 +39,11 @@ export default function DashboardPage() {
     staleTime: 30 * 1000,
   });
 
-  const { data: bookmarks, isLoading: bookmarksLoading } = useQuery({
+  const {
+    data: bookmarks,
+    isLoading: bookmarksLoading,
+    isError: bookmarksError,
+  } = useQuery({
     queryKey: ["bookmarks"],
     queryFn: () => dealsApi.myBookmarks({ limit: 5 }),
     enabled: !!user,
@@ -179,8 +186,26 @@ export default function DashboardPage() {
             {bookmarksLoading ? (
               <div className="space-y-3">
                 {[1, 2, 3].map((i) => (
-                  <Skeleton key={i} className="h-12 w-full" />
+                  <Skeleton key={i} className="h-12 w-full rounded-lg" />
                 ))}
+              </div>
+            ) : bookmarksError ? (
+              <div className="flex flex-col items-center py-6 text-center">
+                <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/50">
+                  <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
+                </div>
+                <p className="mb-3 text-sm text-muted-foreground">
+                  Không thể tải deals đã lưu
+                </p>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="gap-1.5"
+                  onClick={() => window.location.reload()}
+                >
+                  <RefreshCw className="h-3.5 w-3.5" />
+                  Thử lại
+                </Button>
               </div>
             ) : bookmarks && bookmarks.data.length > 0 ? (
               <div className="space-y-3">
@@ -216,12 +241,21 @@ export default function DashboardPage() {
                 ))}
               </div>
             ) : (
-              <div className="py-6 text-center">
-                <p className="text-sm text-muted-foreground">
-                  Bạn chưa lưu deal nào.
+              <div className="flex flex-col items-center py-8 text-center">
+                <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                  <Compass className="h-6 w-6 text-primary" />
+                </div>
+                <p className="mb-1 text-sm font-medium text-foreground">
+                  Bạn chưa lưu deal nào
                 </p>
-                <Button size="sm" variant="outline" className="mt-3" asChild>
-                  <Link href="/deals">Khám phá deals</Link>
+                <p className="mb-4 text-xs text-muted-foreground">
+                  Khám phá và lưu những deal hấp dẫn
+                </p>
+                <Button size="sm" asChild>
+                  <Link href="/deals">
+                    <Compass className="mr-2 h-4 w-4" />
+                    Khám phá deals
+                  </Link>
                 </Button>
               </div>
             )}

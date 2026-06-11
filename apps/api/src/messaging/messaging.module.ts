@@ -3,10 +3,13 @@ import { Module, Global, OnModuleDestroy, Logger } from "@nestjs/common";
 import { MessagingService } from "./messaging.service";
 import { SearchConsumer } from "./consumers/search.consumer";
 import { NotificationConsumer } from "./consumers/notification.consumer";
+import { AnalyticsConsumer } from "../analytics/analytics.consumer";
+import { SearchModule } from "../search/search.module";
 
 @Global()
 @Module({
-  providers: [MessagingService, SearchConsumer, NotificationConsumer],
+  imports: [SearchModule],
+  providers: [MessagingService, SearchConsumer, NotificationConsumer, AnalyticsConsumer],
   exports: [MessagingService],
 })
 export class MessagingModule implements OnModuleDestroy {

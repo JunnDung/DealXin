@@ -1,15 +1,14 @@
 import {
   Injectable,
-  Logger,
   type OnModuleDestroy,
   type OnModuleInit,
 } from "@nestjs/common";
 import { type PrismaService } from "../prisma/prisma.service";
 import { type MessagingService } from "../messaging/messaging.service";
+import { logger } from "./logger/pino.logger";
 
 @Injectable()
 export class OutboxPublisherService implements OnModuleInit, OnModuleDestroy {
-  private readonly logger = new Logger(OutboxPublisherService.name);
   private readonly pollingInterval = 2000; // 2 seconds
   private isRunning = false;
   private timeoutHandle: ReturnType<typeof setTimeout> | null = null;
@@ -22,7 +21,7 @@ export class OutboxPublisherService implements OnModuleInit, OnModuleDestroy {
   async onModuleInit() {
     this.isRunning = true;
     this.scheduleNext();
-    this.logger.log("Outbox publisher started");
+    logger.info("Outbox publisher started");
   }
 
   async onModuleDestroy() {
@@ -30,7 +29,7 @@ export class OutboxPublisherService implements OnModuleInit, OnModuleDestroy {
     if (this.timeoutHandle) {
       clearTimeout(this.timeoutHandle);
     }
-    this.logger.log("Outbox publisher stopped");
+    logger.info("Outbox publisher stopped");
   }
 
   private scheduleNext() {
@@ -66,7 +65,7 @@ export class OutboxPublisherService implements OnModuleInit, OnModuleDestroy {
           idsToMark.push(event.id);
           published++;
         } catch (err) {
-          this.logger.error(
+          logger.error(
             `Failed to publish event ${event.id}: ${err instanceof Error ? err.message : String(err)}`,
           );
         }
@@ -82,7 +81,7 @@ export class OutboxPublisherService implements OnModuleInit, OnModuleDestroy {
 
       return published;
     } catch (err) {
-      this.logger.error(`Outbox publish error: ${err instanceof Error ? err.message : String(err)}`);
+      logger.error(`Outbox publish error: ${err instanceof Error ? err.message : String(err)}`);
       return 0;
     }
   }

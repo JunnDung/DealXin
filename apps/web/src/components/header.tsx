@@ -1,6 +1,8 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import {
+  Bell,
   LayoutDashboard,
   LogOut,
   Menu,
@@ -28,6 +30,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/use-auth";
+import { notificationsApi } from "@/lib/api";
 
 const navLinks = [
   { href: "/deals", label: "Khuyến mãi" },
@@ -41,6 +44,16 @@ export function Header() {
   const { theme, setTheme } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+
+  const { data: unreadCountData } = useQuery({
+    queryKey: ["notifications", "unread-count"],
+    queryFn: () => notificationsApi.getUnreadCount(),
+    enabled: !!user,
+    staleTime: 30 * 1000,
+    refetchInterval: 60 * 1000,
+  });
+
+  const unreadCount = unreadCountData?.unreadCount ?? 0;
 
   const initials = user?.fullName
     ? user.fullName
@@ -129,6 +142,25 @@ export function Header() {
             <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
             <span className="sr-only">Chuyển giao diện</span>
           </Button>
+
+          {isHydrated && user && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="relative h-9 w-9"
+              aria-label="Thông báo"
+              asChild
+            >
+              <Link href="/notifications">
+                <Bell className="h-4 w-4" />
+                {unreadCount > 0 && (
+                  <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                )}
+              </Link>
+            </Button>
+          )}
 
           {isHydrated && !user ? (
             <div className="hidden gap-2 sm:flex">

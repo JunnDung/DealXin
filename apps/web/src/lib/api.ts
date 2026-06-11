@@ -285,6 +285,147 @@ export const categoriesApi = {
   list: () => apiFetch<CategoryResponse[]>("/api/categories"),
 };
 
+// ─── Search ──────────────────────────────────────────────────────────────────
+
+export const searchApi = {
+  search: (parameters: SearchQueryParams) => {
+    const qs = parameters
+      ? "?" +
+        new URLSearchParams(
+          queryStringify(parameters as Record<string, unknown>),
+        )
+      : "";
+    return apiFetch<PaginatedResponse<DealResponse>>(`/api/search/deals${qs}`, {
+      auth: false,
+    });
+  },
+};
+
+export interface SearchDealsParams {
+  q?: string;
+  platform?: string;
+  categoryId?: string;
+  minDiscount?: number;
+  maxDiscount?: number;
+  sortBy?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface SearchDealsResponse {
+  success: boolean;
+  data: {
+    hits: Record<string, unknown>[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
+export async function searchDeals(
+  parameters: SearchDealsParams = {},
+): Promise<SearchDealsResponse["data"]> {
+  const queryParams = new URLSearchParams();
+  if (parameters.q) queryParams.set("q", parameters.q);
+  if (parameters.platform) queryParams.set("platform", parameters.platform);
+  if (parameters.categoryId)
+    queryParams.set("categoryId", parameters.categoryId);
+  if (parameters.minDiscount !== undefined)
+    queryParams.set("minDiscount", String(parameters.minDiscount));
+  if (parameters.maxDiscount !== undefined)
+    queryParams.set("maxDiscount", String(parameters.maxDiscount));
+  if (parameters.sortBy) queryParams.set("sortBy", parameters.sortBy);
+  if (parameters.page !== undefined)
+    queryParams.set("page", String(parameters.page));
+  if (parameters.limit !== undefined)
+    queryParams.set("limit", String(parameters.limit));
+
+  return apiFetch<SearchDealsResponse["data"]>(
+    `/search/deals?${queryParams.toString()}`,
+    { auth: false },
+  );
+}
+
+// ─── Analytics ────────────────────────────────────────────────────────────────
+
+export interface AnalyticsOverviewResponse {
+  success: boolean;
+  data: {
+    totals: {
+      pageViews: number;
+      upvotes: number;
+      bookmarks: number;
+      total: number;
+    };
+    topDeals: {
+      dealId: string;
+      _count: { dealId: number };
+    }[];
+    dealsByDay: {
+      date: string;
+      count: number;
+    }[];
+  };
+}
+
+export async function getAnalyticsOverview(
+  days: number = 7,
+): Promise<AnalyticsOverviewResponse> {
+  return apiFetch<AnalyticsOverviewResponse>(
+    `/admin/analytics/overview?days=${days}`,
+  );
+}
+
+// ─── Notifications ─────────────────────────────────────────────────────────────
+
+export const notificationsApi = {
+  list: (parameters?: {
+    page?: number;
+    limit?: number;
+    unreadOnly?: boolean;
+  }) => {
+    const qs = parameters
+      ? "?" +
+        new URLSearchParams(
+          queryStringify(parameters as Record<string, unknown>),
+        )
+      : "";
+    return apiFetch<NotificationsListResponse>(`/notifications${qs}`);
+  },
+
+  getUnreadCount: () =>
+    apiFetch<{ unreadCount: number }>("/notifications/unread-count"),
+
+  markRead: (id: string) =>
+    apiFetch<void>(`/notifications/${id}/read`, { method: "PATCH" }),
+
+  markAllRead: () =>
+    apiFetch<void>("/notifications/read-all", { method: "PATCH" }),
+
+  delete: (id: string) =>
+    apiFetch<void>(`/notifications/${id}`, { method: "DELETE" }),
+};
+
+export interface NotificationsListResponse {
+  notifications: NotificationResponse[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  unreadCount: number;
+}
+
+export interface NotificationResponse {
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+  data?: Record<string, unknown>;
+  isRead: boolean;
+  createdAt: string;
+}
+
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 export interface UserResponse {
@@ -353,6 +494,17 @@ export interface DealsQueryParams {
   platform?: string;
   status?: string;
   search?: string;
+}
+
+export interface SearchQueryParams {
+  q?: string;
+  page?: number;
+  limit?: number;
+  sortBy?: "newest" | "discount" | "hot" | "price_low" | "price_high";
+  platform?: string;
+  categoryId?: string;
+  minDiscount?: number;
+  maxDiscount?: number;
 }
 
 interface CreateDealInput {

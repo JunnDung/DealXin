@@ -1,15 +1,14 @@
 import {
   Injectable,
   OnModuleInit,
-  Logger,
 } from "@nestjs/common";
 import * as amqp from "amqp-connection-manager";
 import { ChannelWrapper } from "amqp-connection-manager";
 import { Channel, ConsumeMessage } from "amqplib";
+import { logger } from "../common/logger/pino.logger";
 
 @Injectable()
 export class MessagingService implements OnModuleInit {
-  private readonly logger = new Logger(MessagingService.name);
   private connection: amqp.AmqpConnectionManager | null = null;
   private channelWrapper: ChannelWrapper | null = null;
   private readonly connectionUrl: string;
@@ -26,7 +25,7 @@ export class MessagingService implements OnModuleInit {
 
   private async connect(): Promise<void> {
     try {
-      this.logger.log(`Connecting to RabbitMQ at ${this.connectionUrl}`);
+      logger.info(`Connecting to RabbitMQ at ${this.connectionUrl}`);
 
       this.connection = amqp.connect([this.connectionUrl], {
         reconnectTimeInSeconds: 5,
@@ -34,36 +33,36 @@ export class MessagingService implements OnModuleInit {
 
       this.connection.on("connect", () => {
         this.isConnected = true;
-        this.logger.log("RabbitMQ connection established");
+        logger.info("RabbitMQ connection established");
       });
 
       this.connection.on("disconnect", (err) => {
         this.isConnected = false;
-        this.logger.warn(
-          `RabbitMQ disconnected${err?.err ? `: ${err.err.message}` : ""}`
+        logger.warn(
+          `RabbitMQ disconnected${err?.err ? `: ${err.err.message}` : ""}`,
         );
       });
 
       this.connection.on("connectFailed", (err) => {
         this.isConnected = false;
-        this.logger.error(
-          `RabbitMQ connection failed${err?.err ? `: ${err.err.message}` : ""}`
+        logger.error(
+          `RabbitMQ connection failed${err?.err ? `: ${err.err.message}` : ""}`,
         );
       });
 
       this.channelWrapper = this.connection.createChannel({
         json: true,
         setup: async () => {
-          this.logger.log("RabbitMQ channel created");
+          logger.info("RabbitMQ channel created");
         },
       });
 
       await this.channelWrapper.waitForConnect();
     } catch (error) {
-      this.logger.error(
+      logger.error(
         `Failed to connect to RabbitMQ: ${
           error instanceof Error ? error.message : String(error)
-        }`
+        }`,
       );
       throw error;
     }
@@ -71,8 +70,8 @@ export class MessagingService implements OnModuleInit {
 
   async publish(routingKey: string, payload: unknown): Promise<void> {
     if (!this.channelWrapper || !this.isConnected) {
-      this.logger.warn(
-        "RabbitMQ not connected. Message will be queued for retry."
+      logger.warn(
+        "RabbitMQ not connected. Message will be queued for retry.",
       );
       await this.waitForConnection();
     }
@@ -88,12 +87,12 @@ export class MessagingService implements OnModuleInit {
           contentType: "application/json",
         }
       );
-      this.logger.debug(`Message published to ${routingKey}`);
+      logger.debug(`Message published to ${routingKey}`);
     } catch (error) {
-      this.logger.error(
+      logger.error(
         `Failed to publish message to ${routingKey}: ${
           error instanceof Error ? error.message : String(error)
-        }`
+        }`,
       );
       throw error;
     }
@@ -104,7 +103,7 @@ export class MessagingService implements OnModuleInit {
     handler: (msg: unknown) => Promise<void>
   ): Promise<void> {
     if (!this.channelWrapper || !this.isConnected) {
-      this.logger.warn("RabbitMQ not connected. Waiting for connection...");
+      logger.warn("RabbitMQ not connected. Waiting for connection...");
       await this.waitForConnection();
     }
 
@@ -124,10 +123,10 @@ export class MessagingService implements OnModuleInit {
               await handler(content);
               channel.ack(msg);
             } catch (error) {
-              this.logger.error(
+              logger.error(
                 `Error processing message from ${queue}: ${
                   error instanceof Error ? error.message : String(error)
-                }`
+                }`,
               );
               channel.nack(msg, false, false);
             }
@@ -137,13 +136,13 @@ export class MessagingService implements OnModuleInit {
           }
         );
 
-        this.logger.log(`Subscribed to queue: ${queue}`);
+        logger.info(`Subscribed to queue: ${queue}`);
       });
     } catch (error) {
-      this.logger.error(
+      logger.error(
         `Failed to subscribe to queue ${queue}: ${
           error instanceof Error ? error.message : String(error)
-        }`
+        }`,
       );
       throw error;
     }
@@ -177,12 +176,12 @@ export class MessagingService implements OnModuleInit {
         this.connection = null;
       }
       this.isConnected = false;
-      this.logger.log("RabbitMQ connection closed gracefully");
+      logger.info("RabbitMQ connection closed gracefully");
     } catch (error) {
-      this.logger.error(
+      logger.error(
         `Error closing RabbitMQ connection: ${
           error instanceof Error ? error.message : String(error)
-        }`
+        }`,
       );
     }
   }

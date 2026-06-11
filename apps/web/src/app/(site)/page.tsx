@@ -5,16 +5,19 @@ import {
   ArrowRight,
   ChevronRight,
   Clock,
+  Compass,
   ShieldCheck,
   Tag,
   TrendingUp,
   Zap,
 } from "lucide-react";
 import Link from "next/link";
+import { Suspense } from "react";
 
 import { DealCard } from "@/components/deal-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { dealsApi } from "@/lib/api";
 
@@ -45,13 +48,79 @@ const CategoryIcon0 = featureCategories[0].icon;
 const CategoryIcon1 = featureCategories[1].icon;
 const CategoryIcon2 = featureCategories[2].icon;
 
-export default function HomePage() {
+function HotDealsSection() {
   const { data: hotDeals, isLoading } = useQuery({
     queryKey: ["deals", "hot"],
     queryFn: () => dealsApi.list({ sortBy: "hot", limit: 4 }),
     staleTime: 60 * 1000,
   });
 
+  return (
+    <section className="bg-secondary/20 py-16">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h2 className="font-jakarta text-2xl font-bold">Deal Hot Nhất</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Những ưu đãi được cộng đồng quan tâm nhất
+            </p>
+          </div>
+          <Button variant="ghost" className="self-start sm:self-auto" asChild>
+            <Link href="/deals?sortBy=hot">
+              Xem tất cả
+              <ChevronRight className="ml-1 h-4 w-4" />
+            </Link>
+          </Button>
+        </div>
+
+        {isLoading ? (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={i}
+                className="overflow-hidden rounded-xl border border-border bg-card"
+              >
+                <Skeleton className="aspect-[16/9] w-full rounded-none" />
+                <div className="space-y-2 p-4">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-5 w-1/2" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : hotDeals && hotDeals.data.length > 0 ? (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {hotDeals.data.map((deal) => (
+              <DealCard key={deal.id} deal={deal} />
+            ))}
+          </div>
+        ) : (
+          <Card className="border-primary/20 bg-primary/5">
+            <CardContent className="flex flex-col items-center py-12 text-center">
+              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
+                <Compass className="h-7 w-7 text-primary" />
+              </div>
+              <h3 className="mb-2 text-lg font-semibold text-foreground">
+                Chưa có deal nào
+              </h3>
+              <p className="mb-6 max-w-sm text-sm text-muted-foreground">
+                Hãy là người đầu tiên chia sẻ một ưu đãi hấp dẫn cho cộng đồng!
+              </p>
+              <Button asChild>
+                <Link href="/deals/new">
+                  <Compass className="mr-2 h-4 w-4" />
+                  Đăng deal đầu tiên
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    </section>
+  );
+}
+
+export default function HomePage() {
   return (
     <div className="flex flex-col">
       {/* ─── Hero ─── */}
@@ -155,57 +224,34 @@ export default function HomePage() {
       </section>
 
       {/* ─── Hot Deals ─── */}
-      <section className="bg-secondary/20 py-16">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <h2 className="font-jakarta text-2xl font-bold">Deal Hot Nhất</h2>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Những ưu đãi được cộng đồng quan tâm nhất
-              </p>
-            </div>
-            <Button variant="ghost" className="self-start sm:self-auto" asChild>
-              <Link href="/deals?sortBy=hot">
-                Xem tất cả
-                <ChevronRight className="ml-1 h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
-
-          {isLoading ? (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="overflow-hidden rounded-xl border border-border bg-card"
-                >
-                  <Skeleton className="aspect-[16/9] w-full" />
-                  <div className="space-y-2 p-4">
-                    <Skeleton className="h-4 w-3/4" />
-                    <Skeleton className="h-5 w-1/2" />
+      <Suspense
+        fallback={
+          <section className="bg-secondary/20 py-16">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+              <div className="mb-8">
+                <Skeleton className="h-8 w-48 mb-2" />
+                <Skeleton className="h-4 w-64" />
+              </div>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="overflow-hidden rounded-xl border border-border bg-card"
+                  >
+                    <Skeleton className="aspect-[16/9] w-full rounded-none" />
+                    <div className="space-y-2 p-4">
+                      <Skeleton className="h-4 w-3/4" />
+                      <Skeleton className="h-5 w-1/2" />
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          ) : hotDeals && hotDeals.data.length > 0 ? (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {hotDeals.data.map((deal) => (
-                <DealCard key={deal.id} deal={deal} />
-              ))}
-            </div>
-          ) : (
-            <div className="rounded-xl border border-border bg-card p-12 text-center">
-              <Tag className="mx-auto mb-3 h-8 w-8 text-muted-foreground" />
-              <p className="text-muted-foreground">
-                Chưa có deal nào. Hãy là người đầu tiên!
-              </p>
-              <Button className="mt-4" asChild>
-                <Link href="/deals/new">Đăng deal đầu tiên</Link>
-              </Button>
-            </div>
-          )}
-        </div>
-      </section>
+          </section>
+        }
+      >
+        <HotDealsSection />
+      </Suspense>
 
       {/* ─── Feature categories — asymmetric, not 3 equal columns ─── */}
       <section className="py-16">
@@ -218,9 +264,6 @@ export default function HomePage() {
               Tìm deal phù hợp với mục tiêu tiết kiệm của bạn
             </p>
           </div>
-          const CategoryIcon0 = featureCategories[0].icon; const CategoryIcon1 =
-          featureCategories[1].icon; const CategoryIcon2 =
-          featureCategories[2].icon;
           {/* Asymmetric: center card wider than sides */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             {/* Left */}
