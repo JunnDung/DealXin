@@ -28,6 +28,9 @@ jobs:
         env:
           SKIP_GITHUB_ACTIONS_AUTH: 'true'
 
+      - name: Generate Prisma Client
+        run: pnpm --filter api prisma generate
+
       - name: Typecheck all packages
         run: pnpm typecheck
 
