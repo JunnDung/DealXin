@@ -177,13 +177,15 @@ _To run locally, see [Deployment Guide](./docs/deployment.md)_
 ## Docs
 
 - [Roadmap](docs/roadmap.md)
-- [Architecture ADR](docs/adr/0001-architecture-style.md)
-- [Database ADR](docs/adr/0002-database-choice.md)
-- [Event Broker ADR](docs/adr/0003-event-broker-choice.md)
-- [Search Engine ADR](docs/adr/0004-search-engine-choice.md)
-- [Package Manager ADR](docs/adr/0005-package-manager.md)
+- [Architecture Overview](docs/architecture.md) — System architecture, data flows, module map
+- [Design Patterns](docs/design-patterns.md) — Repository, Strategy, Adapter, Outbox, CQRS patterns with code references
+- [Event Contracts](docs/event-contracts.md) — Domain event shapes, queue architecture, consumer idempotency
 - [Database ERD](docs/database-erd.md)
 - [API Docs](docs/api-docs.md)
+- [Testing Guide](docs/testing.md)
+- [Deployment Guide](docs/deployment.md)
+- [CV Bullets](docs/cv-bullets.md)
+- [Interview Q&A](docs/interview-qa.md)
 
 ## Environment Variables
 

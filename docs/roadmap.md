@@ -197,7 +197,15 @@ dealxin/
 - [x] Screenshots for README
 - [x] `docs/cv-bullets.md`
 - [x] `docs/interview-qa.md`
-- [x] Architecture diagram
+- [x] `docs/architecture.md`
+- [x] `docs/design-patterns.md`
+- [x] `docs/event-contracts.md`
+- [x] `docs/adr/adr-001-outbox-pattern.md`
+- [x] `docs/adr/adr-002-adapter-pattern.md`
+- [x] `e2e/auth.spec.ts` (auth flow E2E)
+- [x] `e2e/deals.spec.ts` (deals listing, bookmark, detail E2E)
+- [x] `e2e/admin.spec.ts` (admin moderation, analytics E2E)
+- [x] `e2e/search.spec.ts` (search, filter, sort E2E)
 - [x] Final README polish
 
 ---
