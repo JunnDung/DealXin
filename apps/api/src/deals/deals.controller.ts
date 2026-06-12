@@ -9,8 +9,6 @@ import {
   Post,
   Query,
   UseGuards,
-  UsePipes,
-  ValidationPipe,
 } from "@nestjs/common";
 import {
   ApiBearerAuth,
@@ -27,7 +25,7 @@ import {
 import { Roles } from "../auth/decorators/roles.decorator";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
-import { type DealsService } from "./deals.service";
+import { DealsService } from "./deals.service";
 import {
   type CreateDealDto,
   type DealFilterQueryDto,
@@ -39,13 +37,6 @@ import {
 
 @ApiTags("Deals")
 @Controller()
-@UsePipes(
-  new ValidationPipe({
-    whitelist: true,
-    forbidNonWhitelisted: true,
-    transform: true,
-  }),
-)
 export class DealsController {
   constructor(private readonly deals: DealsService) {}
 

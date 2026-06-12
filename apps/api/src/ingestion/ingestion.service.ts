@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 
-import { type PrismaService } from "../prisma/prisma.service";
-import { type AuditLogService } from "../common/audit-log.service";
+import { PrismaService } from "../prisma/prisma.service";
+import { AuditLogService } from "../common/audit-log.service";
 import { AdapterFactory } from "./adapters/adapter.factory";
 import { CsvImportAdapter } from "./adapters/csv-import.adapter";
 import { JsonImportAdapter } from "./adapters/json-import.adapter";

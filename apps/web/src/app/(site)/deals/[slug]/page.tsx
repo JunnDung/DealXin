@@ -425,12 +425,12 @@ export default function DealDetailPage({ params }: DealDetailPageProps) {
           )}
 
           {/* Creator */}
-          {deal.creator && (
+          {deal.createdBy && (
             <div className="rounded-xl border border-border bg-card p-5">
               <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Người đăng
               </p>
-              <p className="text-sm text-foreground">{deal.creator.fullName}</p>
+              <p className="text-sm text-foreground">{deal.createdBy?.name}</p>
             </div>
           )}
         </div>

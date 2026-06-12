@@ -55,8 +55,8 @@ export function Header() {
 
   const unreadCount = unreadCountData?.unreadCount ?? 0;
 
-  const initials = user?.fullName
-    ? user.fullName
+  const initials = user?.name
+    ? user.name
         .split(" ")
         .map((n) => n[0])
         .slice(0, 2)
@@ -195,7 +195,7 @@ export function Header() {
                 <DropdownMenuContent className="w-52" align="end">
                   <div className="flex items-center justify-start gap-2 px-2 py-1.5">
                     <div className="flex flex-col space-y-0.5 leading-none">
-                      <p className="text-sm font-medium">{user.fullName}</p>
+                      <p className="text-sm font-medium">{user.name}</p>
                       <p className="text-xs text-muted-foreground">
                         {user.email}
                       </p>

@@ -1,15 +1,16 @@
 import {
   BadRequestException,
   ForbiddenException,
+  Inject,
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
 import { type Deal, DealStatus } from "@prisma/client";
 
-import { type AuditLogService } from "../common/audit-log.service";
-import { type OutboxService } from "../common/outbox.service";
+import { AuditLogService } from "../common/audit-log.service";
+import { OutboxService } from "../common/outbox.service";
 import { PaginatedResponse } from "../common/pagination";
-import { type PrismaService } from "../prisma/prisma.service";
+import { PrismaService } from "../prisma/prisma.service";
 import {
   type CreateDealDto,
   type DealFilterQueryDto,
@@ -25,6 +26,7 @@ import {
 } from "./strategies";
 import { MessagingService } from "../messaging/messaging.service";
 import { Queues } from "../messaging/routing-keys";
+import { DEAL_REPOSITORY, DEAL_STATUS_STRATEGY } from "./deals.tokens";
 
 function slugify(text: string): string {
   return text
@@ -47,8 +49,8 @@ export class DealsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly auditLog: AuditLogService,
-    private readonly repository: DealRepository,
-    private readonly statusTransition: DealStatusTransitionStrategy,
+    @Inject(DEAL_REPOSITORY) private readonly repository: DealRepository,
+    @Inject(DEAL_STATUS_STRATEGY) private readonly statusTransition: DealStatusTransitionStrategy,
     private readonly outbox: OutboxService,
     private readonly messagingService: MessagingService,
   ) {}

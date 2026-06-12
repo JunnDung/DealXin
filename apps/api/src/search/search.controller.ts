@@ -3,7 +3,7 @@ import { SearchService, type SearchDealsOptions } from "./search.service";
 import { ApiTags, ApiBearerAuth, ApiResponse } from "@nestjs/swagger";
 
 @ApiTags("search")
-@Controller("api/search")
+@Controller("search")
 export class SearchController {
   constructor(private readonly searchService: SearchService) {}
 

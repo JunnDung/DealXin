@@ -1,22 +1,15 @@
-import { ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 
 import { AppModule } from "./app.module";
+import { CustomValidationPipe } from "./common/pipes/custom-validation.pipe";
 import { AppErrorFilter } from "./common/filters/app-error.filter";
 import { logger } from "./common/logger/pino.logger";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-      transformOptions: { enableImplicitConversion: true },
-    }),
-  );
+  app.useGlobalPipes(new CustomValidationPipe());
 
   app.useGlobalFilters(new AppErrorFilter());
 
@@ -25,7 +18,7 @@ async function bootstrap() {
     credentials: true,
   });
 
-  app.setGlobalPrefix("api", { exclude: ["health", "api/docs"] });
+  app.setGlobalPrefix("api", { exclude: ["health", "health/live", "health/ready", "api/docs"] });
 
   const config = new DocumentBuilder()
     .setTitle("DealXin API")

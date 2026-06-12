@@ -39,7 +39,7 @@ interface MulterFile {
 }
 
 @ApiTags("ingestion")
-@Controller("api/ingestion")
+@Controller("ingestion")
 export class IngestionController {
   constructor(private readonly ingestionService: IngestionService) {}
 

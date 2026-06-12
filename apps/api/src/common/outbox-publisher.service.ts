@@ -3,8 +3,8 @@ import {
   type OnModuleDestroy,
   type OnModuleInit,
 } from "@nestjs/common";
-import { type PrismaService } from "../prisma/prisma.service";
-import { type MessagingService } from "../messaging/messaging.service";
+import { PrismaService } from "../prisma/prisma.service";
+import { MessagingService } from "../messaging/messaging.service";
 import { logger } from "./logger/pino.logger";
 
 @Injectable()

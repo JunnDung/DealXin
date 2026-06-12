@@ -6,7 +6,7 @@ import { UserRole } from "@prisma/client";
 import { AnalyticsService } from "./analytics.service";
 
 @ApiTags("analytics")
-@Controller("api/admin/analytics")
+@Controller("admin/analytics")
 @UseGuards(JwtAuthGuard)
 export class AnalyticsController {
   constructor(private readonly analyticsService: AnalyticsService) {}

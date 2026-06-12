@@ -1,6 +1,7 @@
 import {
   Injectable,
   OnModuleInit,
+  OnModuleDestroy,
 } from "@nestjs/common";
 import * as amqp from "amqp-connection-manager";
 import { ChannelWrapper } from "amqp-connection-manager";
@@ -8,15 +9,21 @@ import { Channel, ConsumeMessage } from "amqplib";
 import { logger } from "../common/logger/pino.logger";
 
 @Injectable()
-export class MessagingService implements OnModuleInit {
+export class MessagingService implements OnModuleInit, OnModuleDestroy {
   private connection: amqp.AmqpConnectionManager | null = null;
   private channelWrapper: ChannelWrapper | null = null;
   private readonly connectionUrl: string;
   private isConnected = false;
+  private readonly subscribers: Map<string, (msg: unknown) => Promise<void>> = new Map();
+  private connectionReadyPromise: Promise<void>;
+  private resolveConnectionReady?: () => void;
 
   constructor() {
     this.connectionUrl =
       process.env.RABBITMQ_URL || "amqp://localhost:5672";
+    this.connectionReadyPromise = new Promise((resolve) => {
+      this.resolveConnectionReady = resolve;
+    });
   }
 
   async onModuleInit() {
@@ -52,12 +59,39 @@ export class MessagingService implements OnModuleInit {
 
       this.channelWrapper = this.connection.createChannel({
         json: true,
-        setup: async () => {
-          logger.info("RabbitMQ channel created");
+        setup: async (channel: Channel) => {
+          logger.info("RabbitMQ channel created and ready");
+
+          for (const [queue, handler] of this.subscribers) {
+            await channel.assertQueue(queue, { durable: true });
+            await channel.consume(
+              queue,
+              async (msg: ConsumeMessage | null) => {
+                if (!msg) return;
+                try {
+                  const content = JSON.parse(msg.content.toString());
+                  await handler(content);
+                  channel.ack(msg);
+                } catch (error) {
+                  logger.error(
+                    `Error processing message from ${queue}: ${
+                      error instanceof Error ? error.message : String(error)
+                    }`,
+                  );
+                  channel.nack(msg, false, false);
+                }
+              },
+              { noAck: false }
+            );
+            logger.info(`Subscribed to queue: ${queue}`);
+          }
         },
       });
 
       await this.channelWrapper.waitForConnect();
+      if (this.resolveConnectionReady) {
+        this.resolveConnectionReady();
+      }
     } catch (error) {
       logger.error(
         `Failed to connect to RabbitMQ: ${
@@ -73,7 +107,7 @@ export class MessagingService implements OnModuleInit {
       logger.warn(
         "RabbitMQ not connected. Message will be queued for retry.",
       );
-      await this.waitForConnection();
+      await this.connectionReadyPromise;
     }
 
     try {
@@ -102,22 +136,15 @@ export class MessagingService implements OnModuleInit {
     queue: string,
     handler: (msg: unknown) => Promise<void>
   ): Promise<void> {
-    if (!this.channelWrapper || !this.isConnected) {
-      logger.warn("RabbitMQ not connected. Waiting for connection...");
-      await this.waitForConnection();
-    }
+    this.subscribers.set(queue, handler);
 
-    try {
-      await this.channelWrapper!.addSetup(async (channel: Channel) => {
-        await channel.assertQueue(queue, {
-          durable: true,
-        });
-
+    if (this.channelWrapper && this.isConnected) {
+      await this.channelWrapper.addSetup(async (channel: Channel) => {
+        await channel.assertQueue(queue, { durable: true });
         await channel.consume(
           queue,
           async (msg: ConsumeMessage | null) => {
             if (!msg) return;
-
             try {
               const content = JSON.parse(msg.content.toString());
               await handler(content);
@@ -131,41 +158,14 @@ export class MessagingService implements OnModuleInit {
               channel.nack(msg, false, false);
             }
           },
-          {
-            noAck: false,
-          }
+          { noAck: false }
         );
-
         logger.info(`Subscribed to queue: ${queue}`);
       });
-    } catch (error) {
-      logger.error(
-        `Failed to subscribe to queue ${queue}: ${
-          error instanceof Error ? error.message : String(error)
-        }`,
-      );
-      throw error;
     }
   }
 
-  private async waitForConnection(maxWaitMs = 30000): Promise<void> {
-    if (this.isConnected && this.channelWrapper) {
-      return;
-    }
-
-    const startTime = Date.now();
-
-    while (!this.isConnected || !this.channelWrapper) {
-      if (Date.now() - startTime > maxWaitMs) {
-        throw new Error(
-          "Timeout waiting for RabbitMQ connection"
-        );
-      }
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    }
-  }
-
-  async close(): Promise<void> {
+  async onModuleDestroy(): Promise<void> {
     try {
       if (this.channelWrapper) {
         await this.channelWrapper.close();

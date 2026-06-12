@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 interface TokenPair {
   accessToken: string;
@@ -66,13 +66,14 @@ async function refreshAccessToken(): Promise<string | null> {
     }
 
     const json = await res.json();
-    if (!json.data?.accessToken) {
+    const data = json.data ?? json;
+    if (!data?.accessToken) {
       clearTokens();
       return null;
     }
 
-    setStorageItem(ACCESS_TOKEN_KEY, json.data.accessToken);
-    return json.data.accessToken;
+    setStorageItem(ACCESS_TOKEN_KEY, data.accessToken);
+    return data.accessToken;
   } catch {
     clearTokens();
     return null;
@@ -105,7 +106,7 @@ export async function apiFetch<T>(
     const reqHeaders = token
       ? { ...headers, Authorization: `Bearer ${token}` }
       : headers;
-    return fetch(`${API_BASE_URL}${endpoint}`, {
+    return fetch(`${API_BASE_URL}/api${endpoint}`, {
       ...fetchOptions,
       headers: reqHeaders,
     });
@@ -127,11 +128,12 @@ export async function apiFetch<T>(
     } catch {
       // ignore parse error
     }
+    const json = errorData;
     const message =
-      (errorData.error as string) ||
-      (errorData.message as string) ||
+      (json.error as string) ||
+      (json.message as string) ||
       `HTTP ${res.status}`;
-    throw new ApiError(res.status, message, errorData);
+    throw new ApiError(res.status, message, json);
   }
 
   const json = (await res.json()) as Record<string, unknown>;
@@ -144,7 +146,8 @@ export async function apiFetch<T>(
     );
   }
 
-  return json.data as T;
+  const data = json.data ?? json;
+  return data as T;
 }
 
 export class ApiError extends Error {
@@ -162,28 +165,38 @@ export class ApiError extends Error {
 
 export const authApi = {
   login: (body: { email: string; password: string }) =>
-    apiFetch<{ user: UserResponse; tokens: TokenPair }>("/api/auth/login", {
+    apiFetch<{
+      user: UserResponse;
+      accessToken: string;
+      refreshToken: string;
+      expiresIn: number;
+    }>("/auth/login", {
       method: "POST",
       body: JSON.stringify(body),
       auth: false,
     }),
 
-  register: (body: { email: string; password: string; fullName: string }) =>
-    apiFetch<{ user: UserResponse; tokens: TokenPair }>("/api/auth/register", {
+  register: (body: { email: string; password: string; name: string }) =>
+    apiFetch<{
+      user: UserResponse;
+      accessToken: string;
+      refreshToken: string;
+      expiresIn: number;
+    }>("/auth/register", {
       method: "POST",
       body: JSON.stringify(body),
       auth: false,
     }),
 
   refresh: () =>
-    apiFetch<{ accessToken: string }>("/api/auth/refresh", {
+    apiFetch<{ accessToken: string }>("/auth/refresh", {
       method: "POST",
       auth: false,
     }),
 
-  me: () => apiFetch<UserResponse>("/api/auth/me"),
+  me: () => apiFetch<UserResponse>("/auth/me"),
 
-  logout: () => apiFetch<void>("/api/auth/logout", { method: "POST" }),
+  logout: () => apiFetch<void>("/auth/logout", { method: "POST" }),
 };
 
 // ─── Deals ───────────────────────────────────────────────────────────────────
@@ -196,51 +209,42 @@ export const dealsApi = {
           queryStringify(parameters as Record<string, unknown>),
         )
       : "";
-    return apiFetch<PaginatedResponse<DealResponse>>(`/api/deals${qs}`, {
+    return apiFetch<PaginatedResponse<DealResponse>>(`/deals${qs}`, {
       auth: false,
     });
   },
 
   getBySlug: (slug: string) =>
-    apiFetch<DealResponse>(`/api/deals/${slug}`, { auth: false }),
+    apiFetch<DealResponse>(`/deals/slug/${slug}`, { auth: false }),
 
   create: (body: CreateDealInput) =>
-    apiFetch<DealResponse>("/api/deals", {
+    apiFetch<DealResponse>("/deals", {
       method: "POST",
       body: JSON.stringify(body),
     }),
 
   update: (id: string, body: Partial<CreateDealInput>) =>
-    apiFetch<DealResponse>(`/api/deals/${id}`, {
+    apiFetch<DealResponse>(`/deals/${id}`, {
       method: "PATCH",
       body: JSON.stringify(body),
     }),
 
   delete: (id: string) =>
-    apiFetch<{ message: string }>(`/api/deals/${id}`, { method: "DELETE" }),
-
-  approve: (id: string) =>
-    apiFetch<DealResponse>(`/api/deals/${id}/approve`, { method: "POST" }),
-
-  reject: (id: string, reason?: string) =>
-    apiFetch<DealResponse>(`/api/deals/${id}/reject`, {
-      method: "POST",
-      body: JSON.stringify({ reason }),
-    }),
+    apiFetch<{ message: string }>(`/deals/${id}`, { method: "DELETE" }),
 
   vote: (id: string, type: "up" | "down") =>
-    apiFetch<{ upvotes: number; downvotes: number }>(`/api/deals/${id}/vote`, {
+    apiFetch<{ upvotes: number; downvotes: number }>(`/deals/${id}/vote`, {
       method: "POST",
       body: JSON.stringify({ type }),
     }),
 
   bookmark: (id: string) =>
-    apiFetch<{ message: string }>(`/api/deals/${id}/bookmark`, {
+    apiFetch<{ message: string }>(`/deals/${id}/bookmark`, {
       method: "POST",
     }),
 
   removeBookmark: (id: string) =>
-    apiFetch<{ message: string }>(`/api/deals/${id}/bookmark`, {
+    apiFetch<{ message: string }>(`/deals/${id}/bookmark`, {
       method: "DELETE",
     }),
 
@@ -252,7 +256,7 @@ export const dealsApi = {
         )
       : "";
     return apiFetch<PaginatedResponse<DealResponse>>(
-      `/api/deals/me/bookmarks${qs}`,
+      `/deals/me/bookmarks${qs}`,
     );
   },
 
@@ -263,26 +267,38 @@ export const dealsApi = {
           queryStringify(parameters as Record<string, unknown>),
         )
       : "";
-    return apiFetch<PaginatedResponse<DealResponse>>(`/api/deals/me${qs}`);
+    return apiFetch<PaginatedResponse<DealResponse>>(`/deals/me${qs}`);
   },
 
-  adminAll: (parameters?: DealsQueryParams & { status?: string }) => {
-    const q = parameters
+  adminPending: (parameters?: DealsQueryParams) => {
+    const qs = parameters
       ? "?" +
         new URLSearchParams(
           queryStringify(parameters as Record<string, unknown>),
         )
       : "";
     return apiFetch<PaginatedResponse<DealResponse>>(
-      `/api/deals/admin/all${q}`,
+      `/admin/deals/pending${qs}`,
     );
   },
+
+  adminApprove: (id: string) =>
+    apiFetch<DealResponse>(`/admin/deals/${id}/approve`, { method: "POST" }),
+
+  adminReject: (id: string, reason?: string) =>
+    apiFetch<DealResponse>(`/admin/deals/${id}/reject`, {
+      method: "POST",
+      body: JSON.stringify({ reason }),
+    }),
+
+  adminExpire: (id: string) =>
+    apiFetch<DealResponse>(`/admin/deals/${id}/expire`, { method: "POST" }),
 };
 
 // ─── Categories ──────────────────────────────────────────────────────────────
 
 export const categoriesApi = {
-  list: () => apiFetch<CategoryResponse[]>("/api/categories"),
+  list: () => apiFetch<CategoryResponse[]>("/categories"),
 };
 
 // ─── Search ──────────────────────────────────────────────────────────────────
@@ -295,7 +311,7 @@ export const searchApi = {
           queryStringify(parameters as Record<string, unknown>),
         )
       : "";
-    return apiFetch<PaginatedResponse<DealResponse>>(`/api/search/deals${qs}`, {
+    return apiFetch<PaginatedResponse<DealResponse>>(`/search/deals${qs}`, {
       auth: false,
     });
   },
@@ -312,61 +328,23 @@ export interface SearchDealsParams {
   limit?: number;
 }
 
-export interface SearchDealsResponse {
-  success: boolean;
-  data: {
-    hits: Record<string, unknown>[];
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  };
-}
-
-export async function searchDeals(
-  parameters: SearchDealsParams = {},
-): Promise<SearchDealsResponse["data"]> {
-  const queryParams = new URLSearchParams();
-  if (parameters.q) queryParams.set("q", parameters.q);
-  if (parameters.platform) queryParams.set("platform", parameters.platform);
-  if (parameters.categoryId)
-    queryParams.set("categoryId", parameters.categoryId);
-  if (parameters.minDiscount !== undefined)
-    queryParams.set("minDiscount", String(parameters.minDiscount));
-  if (parameters.maxDiscount !== undefined)
-    queryParams.set("maxDiscount", String(parameters.maxDiscount));
-  if (parameters.sortBy) queryParams.set("sortBy", parameters.sortBy);
-  if (parameters.page !== undefined)
-    queryParams.set("page", String(parameters.page));
-  if (parameters.limit !== undefined)
-    queryParams.set("limit", String(parameters.limit));
-
-  return apiFetch<SearchDealsResponse["data"]>(
-    `/search/deals?${queryParams.toString()}`,
-    { auth: false },
-  );
-}
-
 // ─── Analytics ────────────────────────────────────────────────────────────────
 
 export interface AnalyticsOverviewResponse {
-  success: boolean;
-  data: {
-    totals: {
-      pageViews: number;
-      upvotes: number;
-      bookmarks: number;
-      total: number;
-    };
-    topDeals: {
-      dealId: string;
-      _count: { dealId: number };
-    }[];
-    dealsByDay: {
-      date: string;
-      count: number;
-    }[];
+  totals: {
+    pageViews: number;
+    upvotes: number;
+    bookmarks: number;
+    total: number;
   };
+  topDeals: {
+    dealId: string;
+    _count: { dealId: number };
+  }[];
+  dealsByDay: {
+    date: string;
+    count: number;
+  }[];
 }
 
 export async function getAnalyticsOverview(
@@ -431,7 +409,7 @@ export interface NotificationResponse {
 export interface UserResponse {
   id: string;
   email: string;
-  fullName: string;
+  name: string;
   role: "USER" | "ADMIN";
   createdAt: string;
 }
@@ -469,7 +447,8 @@ export interface DealResponse {
   expiredAt?: string;
   category?: CategoryResponse;
   source?: { id: string; name: string };
-  creator?: { id: string; fullName: string };
+  createdBy?: { id: string; name: string };
+  approvedBy?: { id: string; name: string };
   priceHistory?: { price: number; recordedAt: string }[];
   isBookmarked?: boolean;
   createdAt: string;

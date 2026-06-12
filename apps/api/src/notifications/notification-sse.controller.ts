@@ -11,7 +11,7 @@ interface SseMessage {
   timestamp: string;
 }
 
-@Controller("api/notifications")
+@Controller("notifications")
 @UseGuards(JwtAuthGuard)
 export class NotificationSseController {
   constructor(private readonly notificationService: NotificationService) {}

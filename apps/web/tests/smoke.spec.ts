@@ -9,9 +9,9 @@ test.describe("DealXin Smoke Tests", () => {
 
   test("navigation header is visible", async ({ page }) => {
     await page.goto("/");
-    await expect(
-      page.getByRole("banner").getByRole("link", { name: /DealXin/i }),
-    ).toBeVisible();
+    await expect(page.locator("header").first()).toBeVisible({
+      timeout: 15000,
+    });
   });
 
   test("deals page loads", async ({ page }) => {

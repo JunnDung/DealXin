@@ -8,8 +8,6 @@ import {
   Patch,
   Query,
   UseGuards,
-  UsePipes,
-  ValidationPipe,
 } from "@nestjs/common";
 import {
   ApiBearerAuth,
@@ -29,14 +27,7 @@ import {
 } from "./dto/notification.dto";
 
 @ApiTags("Notifications")
-@Controller("api/notifications")
-@UsePipes(
-  new ValidationPipe({
-    whitelist: true,
-    forbidNonWhitelisted: true,
-    transform: true,
-  }),
-)
+@Controller("notifications")
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class NotificationController {

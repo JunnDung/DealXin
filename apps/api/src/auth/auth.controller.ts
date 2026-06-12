@@ -6,8 +6,6 @@ import {
   HttpStatus,
   Post,
   UseGuards,
-  UsePipes,
-  ValidationPipe,
 } from "@nestjs/common";
 import {
   ApiBearerAuth,
@@ -16,7 +14,7 @@ import {
   ApiTags,
 } from "@nestjs/swagger";
 
-import { type AuthService } from "./auth.service";
+import { AuthService } from "./auth.service";
 import { type AuthenticatedUser, CurrentUser, Public } from "./decorators";
 import {
   AuthResponseDto,
@@ -30,13 +28,6 @@ import { JwtAuthGuard } from "./guards";
 
 @ApiTags("Authentication")
 @Controller("auth")
-@UsePipes(
-  new ValidationPipe({
-    whitelist: true,
-    forbidNonWhitelisted: true,
-    transform: true,
-  }),
-)
 export class AuthController {
   constructor(private readonly auth: AuthService) {}
 
