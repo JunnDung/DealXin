@@ -59,14 +59,15 @@ export class SearchService {
     });
 
     return {
-      hits: result.hits,
-      total: result.estimatedTotalHits ?? result.totalHits ?? 0,
-      page,
-      limit,
-      totalPages: Math.ceil(
-        (result.estimatedTotalHits ?? result.totalHits ?? 0) / limit,
-      ),
-      processingTimeMs: result.processingTimeMs,
+      data: result.hits,
+      meta: {
+        total: result.estimatedTotalHits ?? result.totalHits ?? 0,
+        page,
+        limit,
+        totalPages: Math.ceil(
+          (result.estimatedTotalHits ?? result.totalHits ?? 0) / limit,
+        ),
+      },
     };
   }
 

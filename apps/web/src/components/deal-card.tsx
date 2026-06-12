@@ -312,7 +312,7 @@ export function DealCard({
           {/* Buy button — dominant */}
           <Button size="sm" className="gap-1.5 font-semibold" asChild>
             <a
-              href={deal.dealUrl}
+              href={deal.sourceUrl || "#"}
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`Mua tại ${platformLabels[deal.platform]}`}

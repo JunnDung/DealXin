@@ -72,8 +72,12 @@ async function refreshAccessToken(): Promise<string | null> {
       return null;
     }
 
-    setStorageItem(ACCESS_TOKEN_KEY, data.accessToken);
-    return data.accessToken;
+    const { accessToken } = data as {
+      accessToken: string;
+      refreshToken?: string;
+    };
+    setStorageItem(ACCESS_TOKEN_KEY, accessToken);
+    return accessToken;
   } catch {
     clearTokens();
     return null;
@@ -398,10 +402,12 @@ export interface NotificationResponse {
   id: string;
   type: string;
   title: string;
-  message: string;
+  body: string;
   data?: Record<string, unknown>;
   isRead: boolean;
   createdAt: string;
+  readAt?: string;
+  dealId?: string;
 }
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -418,7 +424,8 @@ export interface CategoryResponse {
   id: string;
   name: string;
   slug: string;
-  icon?: string;
+  description?: string;
+  iconUrl?: string;
   dealCount?: number;
 }
 
@@ -432,7 +439,7 @@ export interface DealResponse {
   discountPercent: number;
   currency: string;
   imageUrl?: string;
-  dealUrl: string;
+  sourceUrl?: string;
   couponCode?: string;
   platform: "SHOPEE" | "LAZADA" | "TIKTOK_SHOP" | "OTHER";
   status: "PENDING" | "APPROVED" | "REJECTED" | "EXPIRED";

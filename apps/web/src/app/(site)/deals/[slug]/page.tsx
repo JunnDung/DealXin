@@ -264,7 +264,11 @@ export default function DealDetailPage({ params }: DealDetailPageProps) {
             )}
 
             <Button size="lg" className="mt-4 w-full" asChild>
-              <a href={deal.dealUrl} target="_blank" rel="noopener noreferrer">
+              <a
+                href={deal.sourceUrl || "#"}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <ExternalLink className="mr-2 h-4 w-4" />
                 Mua ngay tại {platformLabels[deal.platform]}
               </a>
