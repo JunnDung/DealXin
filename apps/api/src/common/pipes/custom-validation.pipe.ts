@@ -1,15 +1,19 @@
-import {
-  Injectable,
-  PipeTransform,
-  ArgumentMetadata,
-  BadRequestException,
-} from "@nestjs/common";
-import { validate, ValidationError } from "class-validator";
 import "reflect-metadata";
+
+import {
+  type ArgumentMetadata,
+  BadRequestException,
+  Injectable,
+  type PipeTransform,
+} from "@nestjs/common";
+import { validate, type ValidationError } from "class-validator";
 
 @Injectable()
 export class CustomValidationPipe implements PipeTransform<unknown> {
-  async transform(value: unknown, metadata: ArgumentMetadata): Promise<unknown> {
+  async transform(
+    value: unknown,
+    metadata: ArgumentMetadata,
+  ): Promise<unknown> {
     const { metatype } = metadata;
 
     if (!metatype || !this.toValidate(metadata)) {
@@ -17,7 +21,7 @@ export class CustomValidationPipe implements PipeTransform<unknown> {
     }
 
     // Create instance of the DTO class
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     const instance = new (metatype as new () => Record<string, unknown>)();
 
     // Copy all properties from value to instance using defineProperty to bypass read-only

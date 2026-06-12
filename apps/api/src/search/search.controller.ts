@@ -1,7 +1,8 @@
 import { Controller, Get, Query } from "@nestjs/common";
-import { SearchService, type SearchDealsOptions } from "./search.service";
-import { ApiTags, ApiResponse } from "@nestjs/swagger";
+import { ApiResponse, ApiTags } from "@nestjs/swagger";
+
 import { Public } from "../auth/decorators";
+import { type SearchDealsOptions, type SearchService } from "./search.service";
 
 @ApiTags("search")
 @Controller("search")

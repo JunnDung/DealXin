@@ -18,13 +18,13 @@ import {
 
 import { type AuthenticatedUser, CurrentUser } from "../auth/decorators";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
-import { NotificationService } from "./notification.service";
 import {
   NotificationDto,
-  NotificationQueryDto,
   NotificationListDto,
+  type NotificationQueryDto,
   UnreadCountDto,
 } from "./dto/notification.dto";
+import { type NotificationService } from "./notification.service";
 
 @ApiTags("Notifications")
 @Controller("notifications")

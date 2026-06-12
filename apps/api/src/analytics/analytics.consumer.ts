@@ -1,9 +1,9 @@
-import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
-import { AnalyticsEventType } from "@prisma/client";
+import { Injectable, Logger, type OnModuleInit } from "@nestjs/common";
+import { type AnalyticsEventType } from "@prisma/client";
 
-import { MessagingService } from "../messaging/messaging.service";
+import { type MessagingService } from "../messaging/messaging.service";
 import { Queues } from "../messaging/routing-keys";
-import { AnalyticsService } from "./analytics.service";
+import { type AnalyticsService } from "./analytics.service";
 
 @Injectable()
 export class AnalyticsConsumer implements OnModuleInit {
@@ -17,15 +17,15 @@ export class AnalyticsConsumer implements OnModuleInit {
   async onModuleInit(): Promise<void> {
     await this.messagingService.subscribe(
       Queues.ANALYTICS,
-      async (msg: unknown) => {
-        await this.handleAnalyticsEvent(msg);
+      async (message: unknown) => {
+        await this.handleAnalyticsEvent(message);
       },
     );
     this.logger.log("Analytics consumer started");
   }
 
-  private async handleAnalyticsEvent(msg: unknown): Promise<void> {
-    const event = msg as {
+  private async handleAnalyticsEvent(message: unknown): Promise<void> {
+    const event = message as {
       eventType: string;
       userId?: string;
       dealId?: string;
@@ -50,7 +50,7 @@ export class AnalyticsConsumer implements OnModuleInit {
       this.logger.debug(`Tracked analytics event: ${eventType}`);
     } catch (error) {
       this.logger.error(
-        `Failed to process analytics event: ${error instanceof Error ? error.message : String(error)}`
+        `Failed to process analytics event: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
   }

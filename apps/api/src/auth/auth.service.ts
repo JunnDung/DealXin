@@ -4,12 +4,12 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from "@nestjs/common";
-import { JwtService } from "@nestjs/jwt";
+import { type JwtService } from "@nestjs/jwt";
 import { type User } from "@prisma/client";
 import * as bcrypt from "bcrypt";
 import * as crypto from "crypto";
 
-import { PrismaService } from "../prisma/prisma.service";
+import { type PrismaService } from "../prisma/prisma.service";
 import {
   type AuthResponseDto,
   type LoginDto,

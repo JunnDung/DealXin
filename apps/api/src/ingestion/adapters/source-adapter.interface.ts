@@ -1,4 +1,4 @@
-export type SourceType = 'SHOPEE' | 'LAZADA' | 'TIKTOK_SHOP' | 'JSON' | 'CSV';
+export type SourceType = "SHOPEE" | "LAZADA" | "TIKTOK_SHOP" | "JSON" | "CSV";
 
 export interface RawDealItem {
   externalId?: string;
@@ -31,7 +31,10 @@ export interface SourceAdapter {
   fetch?(options?: Record<string, unknown>): Promise<AdapterParseResult>;
 
   /** Parse raw input data (for file adapters) */
-  parse(input: Buffer | string, options?: Record<string, unknown>): Promise<AdapterParseResult>;
+  parse(
+    input: Buffer | string,
+    options?: Record<string, unknown>,
+  ): Promise<AdapterParseResult>;
 
   /** Normalize raw adapter output to standard format */
   normalize(item: RawDealItem): NormalizedDealInput;
@@ -40,7 +43,7 @@ export interface SourceAdapter {
 export interface NormalizedDealInput {
   title: string;
   description?: string | undefined;
-  platform: 'SHOPEE' | 'LAZADA' | 'TIKTOK_SHOP' | 'OTHER';
+  platform: "SHOPEE" | "LAZADA" | "TIKTOK_SHOP" | "OTHER";
   sourceUrl?: string | undefined;
   imageUrl?: string | undefined;
   originalPrice: number;

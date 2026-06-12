@@ -4,9 +4,9 @@ import { AuditLogService } from "../common/audit-log.service";
 import { OutboxService } from "../common/outbox.service";
 import { DealsController } from "./deals.controller";
 import { DealsService } from "./deals.service";
+import { DEAL_REPOSITORY, DEAL_STATUS_STRATEGY } from "./deals.tokens";
 import { PrismaDealRepository } from "./repositories/prisma-deal.repository";
 import { DealStatusTransitionStrategy } from "./strategies";
-import { DEAL_REPOSITORY, DEAL_STATUS_STRATEGY } from "./deals.tokens";
 
 @Module({
   controllers: [DealsController],

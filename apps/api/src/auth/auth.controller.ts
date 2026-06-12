@@ -14,7 +14,7 @@ import {
   ApiTags,
 } from "@nestjs/swagger";
 
-import { AuthService } from "./auth.service";
+import { type AuthService } from "./auth.service";
 import { type AuthenticatedUser, CurrentUser, Public } from "./decorators";
 import {
   AuthResponseDto,

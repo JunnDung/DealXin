@@ -1,8 +1,13 @@
-export { MockShopeeAdapter } from './mock-shopee.adapter';
-export { MockLazadaAdapter } from './mock-lazada.adapter';
-export { MockTiktokShopAdapter } from './mock-tiktok-shop.adapter';
-export { CsvImportAdapter } from './csv-import.adapter';
-export { JsonImportAdapter } from './json-import.adapter';
-
-export type { SourceAdapter, SourceType, RawDealItem, AdapterParseResult, NormalizedDealInput } from './source-adapter.interface';
-export { AdapterFactory } from './adapter.factory';
+export { AdapterFactory } from "./adapter.factory";
+export { CsvImportAdapter } from "./csv-import.adapter";
+export { JsonImportAdapter } from "./json-import.adapter";
+export { MockLazadaAdapter } from "./mock-lazada.adapter";
+export { MockShopeeAdapter } from "./mock-shopee.adapter";
+export { MockTiktokShopAdapter } from "./mock-tiktok-shop.adapter";
+export type {
+  AdapterParseResult,
+  NormalizedDealInput,
+  RawDealItem,
+  SourceAdapter,
+  SourceType,
+} from "./source-adapter.interface";

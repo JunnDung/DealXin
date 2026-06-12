@@ -7,10 +7,13 @@ import {
 } from "@nestjs/common";
 import { type Deal, DealStatus } from "@prisma/client";
 
-import { AuditLogService } from "../common/audit-log.service";
-import { OutboxService } from "../common/outbox.service";
+import { type AuditLogService } from "../common/audit-log.service";
+import { type OutboxService } from "../common/outbox.service";
 import { PaginatedResponse } from "../common/pagination";
-import { PrismaService } from "../prisma/prisma.service";
+import { type MessagingService } from "../messaging/messaging.service";
+import { Queues } from "../messaging/routing-keys";
+import { type PrismaService } from "../prisma/prisma.service";
+import { DEAL_REPOSITORY, DEAL_STATUS_STRATEGY } from "./deals.tokens";
 import {
   type CreateDealDto,
   type DealFilterQueryDto,
@@ -24,9 +27,6 @@ import {
   type DealStatusTransitionStrategy,
   DefaultDealScoringStrategy,
 } from "./strategies";
-import { MessagingService } from "../messaging/messaging.service";
-import { Queues } from "../messaging/routing-keys";
-import { DEAL_REPOSITORY, DEAL_STATUS_STRATEGY } from "./deals.tokens";
 
 function slugify(text: string): string {
   return text
@@ -50,7 +50,8 @@ export class DealsService {
     private readonly prisma: PrismaService,
     private readonly auditLog: AuditLogService,
     @Inject(DEAL_REPOSITORY) private readonly repository: DealRepository,
-    @Inject(DEAL_STATUS_STRATEGY) private readonly statusTransition: DealStatusTransitionStrategy,
+    @Inject(DEAL_STATUS_STRATEGY)
+    private readonly statusTransition: DealStatusTransitionStrategy,
     private readonly outbox: OutboxService,
     private readonly messagingService: MessagingService,
   ) {}
@@ -310,7 +311,10 @@ export class DealsService {
           action: "DealApproved",
           entityType: "Deal",
           entityId: id,
-          metadata: JSON.stringify({ title: updated.title, platform: updated.platform }),
+          metadata: JSON.stringify({
+            title: updated.title,
+            platform: updated.platform,
+          }),
         },
       });
 

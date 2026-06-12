@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import { Notification, NotificationType } from "@prisma/client";
+import { type Notification, type NotificationType } from "@prisma/client";
 
-import { PrismaService } from "../prisma/prisma.service";
+import { type PrismaService } from "../prisma/prisma.service";
 import {
-  NotificationDto,
-  NotificationQueryDto,
+  type NotificationDto,
+  type NotificationQueryDto,
 } from "./dto/notification.dto";
 
 export interface CreateNotificationData {
@@ -73,7 +73,10 @@ export class NotificationService {
     });
   }
 
-  async markAsRead(userId: string, notificationId: string): Promise<NotificationDto> {
+  async markAsRead(
+    userId: string,
+    notificationId: string,
+  ): Promise<NotificationDto> {
     const notification = await this.prisma.notification.findFirst({
       where: { id: notificationId, userId },
     });
@@ -116,7 +119,9 @@ export class NotificationService {
     });
   }
 
-  async createNotification(data: CreateNotificationData): Promise<NotificationDto> {
+  async createNotification(
+    data: CreateNotificationData,
+  ): Promise<NotificationDto> {
     const notification = await this.prisma.notification.create({
       data: {
         userId: data.userId,

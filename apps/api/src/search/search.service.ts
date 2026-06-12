@@ -1,6 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common";
-import { MeilisearchService } from "./meilisearch.service";
-import { PrismaService } from "../prisma/prisma.service";
+
+import { type PrismaService } from "../prisma/prisma.service";
+import { type MeilisearchService } from "./meilisearch.service";
 
 export interface SearchDealsOptions {
   query: string;

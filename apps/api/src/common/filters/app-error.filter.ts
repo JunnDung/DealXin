@@ -38,7 +38,8 @@ export class AppErrorFilter implements ExceptionFilter {
         success: false,
         error: {
           code: exception.name,
-          message: typeof body?.message === "string" ? body.message : "Bad Request",
+          message:
+            typeof body?.message === "string" ? body.message : "Bad Request",
           details: Array.isArray(body?.errors)
             ? body.errors
             : Array.isArray(body?.details)

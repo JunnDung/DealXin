@@ -1,4 +1,5 @@
 import { Module } from "@nestjs/common";
+
 import { OutboxService } from "./outbox.service";
 import { OutboxPublisherService } from "./outbox-publisher.service";
 

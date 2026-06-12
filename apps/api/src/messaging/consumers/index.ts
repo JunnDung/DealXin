@@ -1,2 +1,2 @@
-export * from "./search.consumer";
 export * from "./notification.consumer";
+export * from "./search.consumer";
