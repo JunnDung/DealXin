@@ -1,16 +1,15 @@
 import { Module } from "@nestjs/common";
 import { MulterModule } from "@nestjs/platform-express";
 
-import { IngestionController } from "./ingestion.controller";
-import { IngestionService } from "./ingestion.service";
 import { AuditLogService } from "../common/audit-log.service";
-
 import { AdapterFactory } from "./adapters/adapter.factory";
-import { MockShopeeAdapter } from "./adapters/mock-shopee.adapter";
-import { MockLazadaAdapter } from "./adapters/mock-lazada.adapter";
-import { MockTiktokShopAdapter } from "./adapters/mock-tiktok-shop.adapter";
 import { CsvImportAdapter } from "./adapters/csv-import.adapter";
 import { JsonImportAdapter } from "./adapters/json-import.adapter";
+import { MockLazadaAdapter } from "./adapters/mock-lazada.adapter";
+import { MockShopeeAdapter } from "./adapters/mock-shopee.adapter";
+import { MockTiktokShopAdapter } from "./adapters/mock-tiktok-shop.adapter";
+import { IngestionController } from "./ingestion.controller";
+import { IngestionService } from "./ingestion.service";
 
 @Module({
   imports: [MulterModule.register({ limits: { fileSize: 10 * 1024 * 1024 } })],

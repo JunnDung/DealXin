@@ -38,8 +38,15 @@ export class AppErrorFilter implements ExceptionFilter {
         success: false,
         error: {
           code: exception.name,
-          message: exception.message,
-          details: body?.message ?? undefined,
+          message:
+            typeof body?.message === "string" ? body.message : "Bad Request",
+          details: Array.isArray(body?.errors)
+            ? body.errors
+            : Array.isArray(body?.details)
+              ? body.details
+              : typeof body?.message === "object"
+                ? body.message
+                : undefined,
         },
         timestamp: new Date().toISOString(),
         requestId,

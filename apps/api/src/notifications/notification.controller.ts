@@ -8,8 +8,6 @@ import {
   Patch,
   Query,
   UseGuards,
-  UsePipes,
-  ValidationPipe,
 } from "@nestjs/common";
 import {
   ApiBearerAuth,
@@ -20,23 +18,16 @@ import {
 
 import { type AuthenticatedUser, CurrentUser } from "../auth/decorators";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
-import { NotificationService } from "./notification.service";
 import {
   NotificationDto,
-  NotificationQueryDto,
   NotificationListDto,
+  type NotificationQueryDto,
   UnreadCountDto,
 } from "./dto/notification.dto";
+import { type NotificationService } from "./notification.service";
 
 @ApiTags("Notifications")
-@Controller("api/notifications")
-@UsePipes(
-  new ValidationPipe({
-    whitelist: true,
-    forbidNonWhitelisted: true,
-    transform: true,
-  }),
-)
+@Controller("notifications")
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class NotificationController {

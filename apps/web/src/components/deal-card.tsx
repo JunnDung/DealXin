@@ -25,7 +25,7 @@ import type { DealResponse } from "@/lib/api";
 interface DealCardProps {
   deal: DealResponse;
   onVote?: (type: "up" | "down") => void;
-  onBookmark?: () => void;
+  onBookmark?: (isBookmarked: boolean) => void;
   voting?: boolean;
 }
 
@@ -294,7 +294,7 @@ export function DealCard({
                         ? "text-primary"
                         : "text-muted-foreground hover:bg-muted hover:text-foreground",
                     ].join(" ")}
-                    onClick={onBookmark}
+                    onClick={() => onBookmark(!!deal.isBookmarked)}
                     aria-label={deal.isBookmarked ? "Bỏ lưu" : "Lưu deal"}
                   >
                     <Bookmark
@@ -312,7 +312,7 @@ export function DealCard({
           {/* Buy button — dominant */}
           <Button size="sm" className="gap-1.5 font-semibold" asChild>
             <a
-              href={deal.dealUrl}
+              href={deal.sourceUrl || "#"}
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`Mua tại ${platformLabels[deal.platform]}`}

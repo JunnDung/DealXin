@@ -68,7 +68,7 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="font-jakarta text-2xl font-bold">
-          Xin chào, {user.fullName}
+          Xin chào, {user.name}
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Chào mừng đến với dashboard của bạn

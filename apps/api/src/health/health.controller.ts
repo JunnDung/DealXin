@@ -1,40 +1,33 @@
 import { Controller, Get } from "@nestjs/common";
-import {
-  HealthCheck,
-  HealthCheckService,
-  TypeOrmHealthIndicator,
-  HealthCheckResult,
-} from "@nestjs/terminus";
 import { ApiTags } from "@nestjs/swagger";
+import { HealthCheck, type HealthCheckResult } from "@nestjs/terminus";
+
+import { Public } from "../auth/decorators/public.decorator";
+import { type PrismaHealthIndicator } from "./prisma-health.indicator";
 
 @ApiTags("Health")
 @Controller("health")
 export class HealthController {
-  constructor(
-    private readonly health: HealthCheckService,
-    private readonly db: TypeOrmHealthIndicator,
-  ) {}
+  constructor(private readonly db: PrismaHealthIndicator) {}
 
+  @Public()
   @Get()
   @HealthCheck()
-  @ApiTags("Health")
   check(): Promise<HealthCheckResult> {
-    return this.health.check([
-      () => this.db.pingCheck("database"),
-    ]);
+    return this.db.pingCheck("database");
   }
 
+  @Public()
   @Get("live")
   @ApiTags("Health")
   liveness(): { status: string } {
     return { status: "ok" };
   }
 
+  @Public()
   @Get("ready")
   @ApiTags("Health")
   readiness(): Promise<HealthCheckResult> {
-    return this.health.check([
-      () => this.db.pingCheck("database"),
-    ]);
+    return this.db.pingCheck("database");
   }
 }

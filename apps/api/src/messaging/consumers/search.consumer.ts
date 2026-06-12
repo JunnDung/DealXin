@@ -1,7 +1,11 @@
-import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
-import { MessagingService } from "../messaging.service";
+import { Injectable, Logger, type OnModuleInit } from "@nestjs/common";
+
+import {
+  type DealDocument,
+  type MeilisearchService,
+} from "../../search/meilisearch.service";
+import { type MessagingService } from "../messaging.service";
 import { Queues } from "../routing-keys";
-import { MeilisearchService, DealDocument } from "../../search/meilisearch.service";
 
 @Injectable()
 export class SearchConsumer implements OnModuleInit {
@@ -15,16 +19,16 @@ export class SearchConsumer implements OnModuleInit {
   async onModuleInit() {
     await this.messagingService.subscribe(
       Queues.SEARCH_INDEX,
-      async (msg: unknown) => {
-        await this.handleSearchIndex(msg);
+      async (message: unknown) => {
+        await this.handleSearchIndex(message);
       },
     );
 
     this.logger.log("Search consumer started");
   }
 
-  private async handleSearchIndex(msg: unknown) {
-    const event = msg as {
+  private async handleSearchIndex(message: unknown) {
+    const event = message as {
       eventType?: string;
       dealId?: string;
       payload?: Record<string, unknown>;
@@ -32,8 +36,7 @@ export class SearchConsumer implements OnModuleInit {
 
     const eventType = event.eventType ?? "";
     const dealId =
-      event.dealId ??
-      (event.payload?.["id"] as string | undefined);
+      event.dealId ?? (event.payload?.["id"] as string | undefined);
 
     this.logger.debug(`Search index event: ${eventType}, dealId: ${dealId}`);
 

@@ -34,9 +34,12 @@ export const useAuthStore = create<AuthState>()(
       login: async (email: string, password: string) => {
         set({ isLoading: true });
         try {
-          const { user, tokens } = await authApi.login({ email, password });
-          setTokens(tokens);
-          set({ user, isLoading: false });
+          const res = await authApi.login({ email, password });
+          setTokens({
+            accessToken: res.accessToken,
+            refreshToken: res.refreshToken,
+          });
+          set({ user: res.user, isLoading: false });
         } catch (err) {
           set({ isLoading: false });
           throw err;
@@ -46,13 +49,16 @@ export const useAuthStore = create<AuthState>()(
       register: async (email: string, password: string, fullName: string) => {
         set({ isLoading: true });
         try {
-          const { user, tokens } = await authApi.register({
+          const res = await authApi.register({
             email,
             password,
-            fullName,
+            name: fullName,
           });
-          setTokens(tokens);
-          set({ user, isLoading: false });
+          setTokens({
+            accessToken: res.accessToken,
+            refreshToken: res.refreshToken,
+          });
+          set({ user: res.user, isLoading: false });
         } catch (err) {
           set({ isLoading: false });
           throw err;

@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ForbiddenException,
+  Inject,
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
@@ -9,7 +10,10 @@ import { type Deal, DealStatus } from "@prisma/client";
 import { type AuditLogService } from "../common/audit-log.service";
 import { type OutboxService } from "../common/outbox.service";
 import { PaginatedResponse } from "../common/pagination";
+import { type MessagingService } from "../messaging/messaging.service";
+import { Queues } from "../messaging/routing-keys";
 import { type PrismaService } from "../prisma/prisma.service";
+import { DEAL_REPOSITORY, DEAL_STATUS_STRATEGY } from "./deals.tokens";
 import {
   type CreateDealDto,
   type DealFilterQueryDto,
@@ -23,8 +27,6 @@ import {
   type DealStatusTransitionStrategy,
   DefaultDealScoringStrategy,
 } from "./strategies";
-import { MessagingService } from "../messaging/messaging.service";
-import { Queues } from "../messaging/routing-keys";
 
 function slugify(text: string): string {
   return text
@@ -47,7 +49,8 @@ export class DealsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly auditLog: AuditLogService,
-    private readonly repository: DealRepository,
+    @Inject(DEAL_REPOSITORY) private readonly repository: DealRepository,
+    @Inject(DEAL_STATUS_STRATEGY)
     private readonly statusTransition: DealStatusTransitionStrategy,
     private readonly outbox: OutboxService,
     private readonly messagingService: MessagingService,
@@ -84,9 +87,9 @@ export class DealsService {
       metadata: { title: deal.title, platform: deal.platform },
     });
 
-    await this.outbox.emit("Deal", deal.id, "DealSubmitted", {
+    await this.outbox.emit("Deal", deal.id, Queues.SEARCH_INDEX, {
       eventId: crypto.randomUUID(),
-      eventType: "DealSubmitted",
+      eventType: "DEAL_SUBMITTED",
       occurredAt: new Date().toISOString(),
       version: 1,
       payload: {
@@ -295,38 +298,66 @@ export class DealsService {
       requestingUserId: adminId,
     });
 
-    const deal = (await this.prisma.deal.update({
-      where: { id },
-      data: { status: DealStatus.APPROVED, approvedById: adminId },
-    })) as Deal;
+    const deal = await this.prisma.$transaction(async (tx) => {
+      const updated = await tx.deal.update({
+        where: { id },
+        data: { status: DealStatus.APPROVED, approvedById: adminId },
+      });
 
-    await this.auditLog.log({
-      userId: adminId,
-      action: "DealApproved",
-      entityType: "Deal",
-      entityId: id,
-      metadata: { title: deal.title, platform: deal.platform },
-    });
+      await tx.auditLog.create({
+        data: {
+          id: crypto.randomUUID(),
+          userId: adminId,
+          action: "DealApproved",
+          entityType: "Deal",
+          entityId: id,
+          metadata: JSON.stringify({
+            title: updated.title,
+            platform: updated.platform,
+          }),
+        },
+      });
 
-    await this.outbox.emit("Deal", id, "DealApproved", {
-      eventId: crypto.randomUUID(),
-      eventType: "DealApproved",
-      occurredAt: new Date().toISOString(),
-      version: 1,
-      payload: {
-        dealId: deal.id,
-        title: deal.title,
-        slug: deal.slug,
-        platform: deal.platform,
-        categoryId: deal.categoryId ?? "",
-        salePrice: deal.salePrice,
-        originalPrice: deal.originalPrice,
-        discountPercent: deal.discountPercent,
-        sourceUrl: deal.sourceUrl ?? "",
-        createdById: deal.createdById,
-        approvedById: adminId,
-        score: deal.score,
-      },
+      await tx.outboxEvent.create({
+        data: {
+          id: crypto.randomUUID(),
+          aggregateType: "Deal",
+          aggregateId: id,
+          eventType: Queues.SEARCH_INDEX,
+          payload: JSON.stringify({
+            eventId: crypto.randomUUID(),
+            eventType: "DEAL_APPROVED",
+            occurredAt: new Date().toISOString(),
+            payload: {
+              dealId: updated.id,
+              title: updated.title,
+              slug: updated.slug,
+              platform: updated.platform,
+              categoryId: updated.categoryId ?? "",
+              salePrice: updated.salePrice,
+              originalPrice: updated.originalPrice,
+              discountPercent: updated.discountPercent,
+              sourceUrl: updated.sourceUrl ?? "",
+              score: updated.score,
+            },
+          }),
+          published: false,
+        },
+      });
+
+      await tx.notification.create({
+        data: {
+          id: crypto.randomUUID(),
+          userId: updated.createdById,
+          type: "DEAL_APPROVED",
+          title: "Deal của bạn đã được duyệt!",
+          body: `Deal "${updated.title}" đã được duyệt và hiển thị công khai.`,
+          dealId: updated.id,
+          isRead: false,
+        },
+      });
+
+      return updated;
     });
 
     await this.messagingService.publish(Queues.ANALYTICS, {
@@ -357,38 +388,52 @@ export class DealsService {
       requestingUserId: adminId,
     });
 
-    const deal = (await this.repository.updateStatus(
-      id,
-      DealStatus.REJECTED,
-    )) as Deal;
+    const deal = await this.prisma.$transaction(async (tx) => {
+      const updated = await tx.deal.update({
+        where: { id },
+        data: { status: DealStatus.REJECTED, approvedById: adminId },
+      });
 
-    await this.auditLog.log({
-      userId: adminId,
-      action: "DealRejected",
-      entityType: "Deal",
-      entityId: id,
-      metadata: { title: deal.title, reason },
-    });
+      await tx.auditLog.create({
+        data: {
+          id: crypto.randomUUID(),
+          userId: adminId,
+          action: "DealRejected",
+          entityType: "Deal",
+          entityId: id,
+          metadata: JSON.stringify({ title: updated.title, reason }),
+        },
+      });
 
-    await this.outbox.emit("Deal", id, "DealRejected", {
-      eventId: crypto.randomUUID(),
-      eventType: "DealRejected",
-      occurredAt: new Date().toISOString(),
-      version: 1,
-      payload: {
-        dealId: deal.id,
-        title: deal.title,
-        slug: deal.slug,
-        platform: deal.platform,
-        categoryId: deal.categoryId ?? "",
-        salePrice: deal.salePrice,
-        originalPrice: deal.originalPrice,
-        discountPercent: deal.discountPercent,
-        sourceUrl: deal.sourceUrl ?? "",
-        createdById: deal.createdById,
-        rejectedById: adminId,
-        reason: reason ?? undefined,
-      },
+      await tx.outboxEvent.create({
+        data: {
+          id: crypto.randomUUID(),
+          aggregateType: "Deal",
+          aggregateId: id,
+          eventType: Queues.SEARCH_INDEX,
+          payload: JSON.stringify({
+            eventId: crypto.randomUUID(),
+            eventType: "DEAL_REJECTED",
+            occurredAt: new Date().toISOString(),
+            payload: { dealId: updated.id, title: updated.title },
+          }),
+          published: false,
+        },
+      });
+
+      await tx.notification.create({
+        data: {
+          id: crypto.randomUUID(),
+          userId: updated.createdById,
+          type: "DEAL_REJECTED",
+          title: "Deal của bạn bị từ chối",
+          body: `Deal "${updated.title}" không được duyệt. Vui lòng kiểm tra lại.`,
+          dealId: updated.id,
+          isRead: false,
+        },
+      });
+
+      return updated;
     });
 
     await this.messagingService.publish(Queues.ANALYTICS, {
@@ -398,8 +443,7 @@ export class DealsService {
       metadata: { title: deal.title, reason },
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return this.toResponseDto(deal as any);
+    return this.toResponseDto(deal);
   }
 
   async expireDeal(id: string, adminId: string): Promise<DealResponseDto> {

@@ -9,8 +9,6 @@ import {
   Post,
   Query,
   UseGuards,
-  UsePipes,
-  ValidationPipe,
 } from "@nestjs/common";
 import {
   ApiBearerAuth,
@@ -39,13 +37,6 @@ import {
 
 @ApiTags("Deals")
 @Controller()
-@UsePipes(
-  new ValidationPipe({
-    whitelist: true,
-    forbidNonWhitelisted: true,
-    transform: true,
-  }),
-)
 export class DealsController {
   constructor(private readonly deals: DealsService) {}
 

@@ -5,6 +5,7 @@ import { APP_GUARD } from "@nestjs/core";
 import { AnalyticsModule } from "./analytics/analytics.module";
 import { AuthModule } from "./auth/auth.module";
 import { JwtAuthGuard } from "./auth/guards/jwt-auth.guard";
+import { CategoriesModule } from "./categories/categories.module";
 import { CommonModule } from "./common/common.module";
 import { OutboxModule } from "./common/outbox.module";
 import { AppConfigModule } from "./config/config.module";
@@ -25,9 +26,10 @@ import { SearchModule } from "./search/search.module";
     AppConfigModule,
     PrismaModule,
     AuthModule,
+    CategoriesModule,
     CommonModule,
-    OutboxModule,
     MessagingModule,
+    OutboxModule,
     DealsModule,
     IngestionModule,
     SearchModule,

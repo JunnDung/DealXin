@@ -106,7 +106,7 @@ export default function AdminPage() {
   const { data, isLoading } = useQuery({
     queryKey: ["admin-deals", page, statusFilter],
     queryFn: () =>
-      dealsApi.adminAll({
+      dealsApi.adminPending({
         page,
         limit: 20,
         ...(statusFilter !== "ALL" ? { status: statusFilter } : {}),
@@ -116,13 +116,13 @@ export default function AdminPage() {
   });
 
   const approveMutation = useMutation({
-    mutationFn: (id: string) => dealsApi.approve(id),
+    mutationFn: (id: string) => dealsApi.adminApprove(id),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ["admin-deals"] }),
   });
 
   const rejectMutation = useMutation({
-    mutationFn: (id: string) => dealsApi.reject(id),
+    mutationFn: (id: string) => dealsApi.adminReject(id),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ["admin-deals"] }),
   });
@@ -180,7 +180,7 @@ export default function AdminPage() {
       header: "Score",
       cell: (info) => <span className="text-sm">{info.getValue()}</span>,
     }),
-    columnHelper.accessor((row) => row.creator?.fullName || "-", {
+    columnHelper.accessor((row) => row.createdBy?.name || "-", {
       id: "creator",
       header: "Người đăng",
     }),

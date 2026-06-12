@@ -39,7 +39,7 @@ const sortOptions = [
 ];
 
 const platformOptions = [
-  { value: "", label: "Tất cả nền tảng" },
+  { value: "ALL", label: "Tất cả nền tảng" },
   { value: "SHOPEE", label: "Shopee" },
   { value: "LAZADA", label: "Lazada" },
   { value: "TIKTOK_SHOP", label: "TikTok Shop" },
@@ -79,21 +79,6 @@ function DealsContent() {
         variant: "destructive",
         title: "Lỗi",
         description: "Không thể bình chọn. Hãy đăng nhập.",
-      });
-    },
-  });
-
-  const bookmarkMutation = useMutation({
-    mutationFn: (id: string) => dealsApi.bookmark(id),
-    onSuccess: () => {
-      toast({ title: "Đã lưu deal!" });
-      queryClient.invalidateQueries({ queryKey: ["deals"] });
-    },
-    onError: () => {
-      toast({
-        variant: "destructive",
-        title: "Lỗi",
-        description: "Hãy đăng nhập để lưu deal.",
       });
     },
   });
@@ -174,8 +159,8 @@ function DealsContent() {
           value={parameters.platform || ""}
           onValueChange={(v) => {
             const url = new URL(window.location.href);
-            if (v) url.searchParams.set("platform", v);
-            else url.searchParams.delete("platform");
+            if (v === "ALL") url.searchParams.delete("platform");
+            else url.searchParams.set("platform", v);
             window.history.pushState({}, "", url.toString());
             queryClient.invalidateQueries({ queryKey: ["deals"] });
           }}
@@ -295,7 +280,21 @@ function DealsContent() {
                 key={deal.id}
                 deal={deal}
                 onVote={(type) => voteMutation.mutate({ id: deal.id, type })}
-                onBookmark={() => bookmarkMutation.mutate(deal.id)}
+                onBookmark={(isBookmarked) => {
+                  if (isBookmarked) {
+                    dealsApi.removeBookmark(deal.id).then(() =>
+                      queryClient.invalidateQueries({
+                        queryKey: ["deals"],
+                      }),
+                    );
+                  } else {
+                    dealsApi.bookmark(deal.id).then(() =>
+                      queryClient.invalidateQueries({
+                        queryKey: ["deals"],
+                      }),
+                    );
+                  }
+                }}
                 voting={voteMutation.isPending}
               />
             ))}

@@ -73,8 +73,8 @@ export default function AnalyticsPage() {
     );
   }
 
-  const totals = data?.data?.totals;
-  const dealsByDay = data?.data?.dealsByDay ?? [];
+  const totals = data?.totals;
+  const dealsByDay = data?.dealsByDay ?? [];
   const maxCount = Math.max(...dealsByDay.map((d) => d.count), 1);
 
   return (

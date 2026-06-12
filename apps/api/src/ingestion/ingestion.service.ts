@@ -1,11 +1,14 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 
-import { type PrismaService } from "../prisma/prisma.service";
 import { type AuditLogService } from "../common/audit-log.service";
-import { AdapterFactory } from "./adapters/adapter.factory";
-import { CsvImportAdapter } from "./adapters/csv-import.adapter";
-import { JsonImportAdapter } from "./adapters/json-import.adapter";
-import type { SourceType, RawDealItem } from "./adapters/source-adapter.interface";
+import { type PrismaService } from "../prisma/prisma.service";
+import { type AdapterFactory } from "./adapters/adapter.factory";
+import { type CsvImportAdapter } from "./adapters/csv-import.adapter";
+import { type JsonImportAdapter } from "./adapters/json-import.adapter";
+import type {
+  RawDealItem,
+  SourceType,
+} from "./adapters/source-adapter.interface";
 
 export interface ImportError {
   title: string;
@@ -127,8 +130,8 @@ export class IngestionService {
       } catch (err: unknown) {
         failed++;
         const title = item.title ?? "Unknown";
-        const msg = err instanceof Error ? err.message : String(err);
-        errors.push({ title, error: msg });
+        const message = err instanceof Error ? err.message : String(err);
+        errors.push({ title, error: message });
       }
 
       const processed = imported + skipped + failed;
@@ -159,7 +162,13 @@ export class IngestionService {
       entityType: "CrawlerJob",
       entityId: job.id,
       userId,
-      metadata: { sourceType, totalItems: items.length, imported, skipped, failed },
+      metadata: {
+        sourceType,
+        totalItems: items.length,
+        imported,
+        skipped,
+        failed,
+      },
     });
 
     return { imported, skipped, failed, errors, jobId: job.id };
@@ -173,9 +182,7 @@ export class IngestionService {
     const originalPrice = item.originalPrice;
     const salePrice = item.salePrice;
     const discountPercent =
-      originalPrice > 0
-        ? Math.round((1 - salePrice / originalPrice) * 100)
-        : 0;
+      originalPrice > 0 ? Math.round((1 - salePrice / originalPrice) * 100) : 0;
 
     const sourceUrl = item.sourceUrl;
     if (sourceUrl) {
@@ -193,7 +200,11 @@ export class IngestionService {
         title: item.title,
         description: item.description ?? null,
         slug,
-        platform: item.platform as "SHOPEE" | "LAZADA" | "TIKTOK_SHOP" | "OTHER",
+        platform: item.platform as
+          | "SHOPEE"
+          | "LAZADA"
+          | "TIKTOK_SHOP"
+          | "OTHER",
         sourceUrl: item.sourceUrl ?? null,
         imageUrl: item.imageUrl ?? null,
         originalPrice,

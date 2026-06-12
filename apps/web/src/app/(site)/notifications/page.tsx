@@ -197,7 +197,7 @@ function NotificationsContent() {
                     </span>
                   </div>
                   <p className="mt-0.5 text-sm text-muted-foreground">
-                    {notification.message}
+                    {notification.body}
                   </p>
                 </div>
                 <div className="flex shrink-0 items-center gap-1">

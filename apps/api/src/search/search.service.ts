@@ -1,6 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common";
-import { MeilisearchService } from "./meilisearch.service";
-import { PrismaService } from "../prisma/prisma.service";
+
+import { type PrismaService } from "../prisma/prisma.service";
+import { type MeilisearchService } from "./meilisearch.service";
 
 export interface SearchDealsOptions {
   query: string;
@@ -59,14 +60,15 @@ export class SearchService {
     });
 
     return {
-      hits: result.hits,
-      total: result.estimatedTotalHits ?? result.totalHits ?? 0,
-      page,
-      limit,
-      totalPages: Math.ceil(
-        (result.estimatedTotalHits ?? result.totalHits ?? 0) / limit,
-      ),
-      processingTimeMs: result.processingTimeMs,
+      data: result.hits,
+      meta: {
+        total: result.estimatedTotalHits ?? result.totalHits ?? 0,
+        page,
+        limit,
+        totalPages: Math.ceil(
+          (result.estimatedTotalHits ?? result.totalHits ?? 0) / limit,
+        ),
+      },
     };
   }
 

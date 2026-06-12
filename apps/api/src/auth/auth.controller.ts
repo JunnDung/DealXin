@@ -6,8 +6,6 @@ import {
   HttpStatus,
   Post,
   UseGuards,
-  UsePipes,
-  ValidationPipe,
 } from "@nestjs/common";
 import {
   ApiBearerAuth,
@@ -30,13 +28,6 @@ import { JwtAuthGuard } from "./guards";
 
 @ApiTags("Authentication")
 @Controller("auth")
-@UsePipes(
-  new ValidationPipe({
-    whitelist: true,
-    forbidNonWhitelisted: true,
-    transform: true,
-  }),
-)
 export class AuthController {
   constructor(private readonly auth: AuthService) {}
 
