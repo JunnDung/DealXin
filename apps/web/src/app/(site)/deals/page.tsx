@@ -83,21 +83,6 @@ function DealsContent() {
     },
   });
 
-  const bookmarkMutation = useMutation({
-    mutationFn: (id: string) => dealsApi.bookmark(id),
-    onSuccess: () => {
-      toast({ title: "Đã lưu deal!" });
-      queryClient.invalidateQueries({ queryKey: ["deals"] });
-    },
-    onError: () => {
-      toast({
-        variant: "destructive",
-        title: "Lỗi",
-        description: "Hãy đăng nhập để lưu deal.",
-      });
-    },
-  });
-
   const activeFilters = [
     parameters.sortBy && parameters.sortBy !== "newest"
       ? {
@@ -295,7 +280,21 @@ function DealsContent() {
                 key={deal.id}
                 deal={deal}
                 onVote={(type) => voteMutation.mutate({ id: deal.id, type })}
-                onBookmark={() => bookmarkMutation.mutate(deal.id)}
+                onBookmark={(isBookmarked) => {
+                  if (isBookmarked) {
+                    dealsApi.removeBookmark(deal.id).then(() =>
+                      queryClient.invalidateQueries({
+                        queryKey: ["deals"],
+                      }),
+                    );
+                  } else {
+                    dealsApi.bookmark(deal.id).then(() =>
+                      queryClient.invalidateQueries({
+                        queryKey: ["deals"],
+                      }),
+                    );
+                  }
+                }}
                 voting={voteMutation.isPending}
               />
             ))}

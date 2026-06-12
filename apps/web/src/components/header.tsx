@@ -48,7 +48,7 @@ export function Header() {
   const { data: unreadCountData } = useQuery({
     queryKey: ["notifications", "unread-count"],
     queryFn: () => notificationsApi.getUnreadCount(),
-    enabled: !!user,
+    enabled: isHydrated && !!user,
     staleTime: 30 * 1000,
     refetchInterval: 60 * 1000,
   });

@@ -25,7 +25,7 @@ import type { DealResponse } from "@/lib/api";
 interface DealCardProps {
   deal: DealResponse;
   onVote?: (type: "up" | "down") => void;
-  onBookmark?: () => void;
+  onBookmark?: (isBookmarked: boolean) => void;
   voting?: boolean;
 }
 
@@ -294,7 +294,7 @@ export function DealCard({
                         ? "text-primary"
                         : "text-muted-foreground hover:bg-muted hover:text-foreground",
                     ].join(" ")}
-                    onClick={onBookmark}
+                    onClick={() => onBookmark(!!deal.isBookmarked)}
                     aria-label={deal.isBookmarked ? "Bỏ lưu" : "Lưu deal"}
                   >
                     <Bookmark

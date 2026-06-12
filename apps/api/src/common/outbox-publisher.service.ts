@@ -87,6 +87,6 @@ export class OutboxPublisherService implements OnModuleInit, OnModuleDestroy {
   }
 
   private buildRoutingKey(event: { aggregateType: string; eventType: string }): string {
-    return `${event.aggregateType.toLowerCase()}.${event.eventType.toLowerCase()}`;
+    return event.eventType;
   }
 }
