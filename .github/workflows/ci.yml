@@ -31,6 +31,21 @@ jobs:
       - name: Generate Prisma Client
         run: pnpm --filter api prisma:generate
 
+      - name: Debug Prisma output
+        run: |
+          echo "=== Node version ==="
+          node --version
+          echo "=== pnpm version ==="
+          pnpm --version
+          echo "=== Prisma client location ==="
+          ls -la node_modules/.prisma/client/ 2>/dev/null || echo "NOT FOUND at node_modules/.prisma/client/"
+          echo "=== node_modules @prisma/client ==="
+          ls -la node_modules/@prisma/client/ 2>/dev/null || echo "NOT FOUND at node_modules/@prisma/client/"
+          echo "=== @prisma/client index ==="
+          cat node_modules/@prisma/client/index.d.ts 2>/dev/null | head -5 || echo "index.d.ts not found"
+          echo "=== Checking .prisma path ==="
+          find node_modules -name ".prisma" -type d 2>/dev/null | head -5
+
       - name: Typecheck API
         run: pnpm --filter api typecheck
         continue-on-error: false
