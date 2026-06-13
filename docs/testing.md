@@ -149,8 +149,10 @@ test:
 
 | Role | Email | Password |
 |------|-------|----------|
-| Admin | admin@dealxin.local | Admin1234! |
-| User | test@example.com | Test1234! |
+| Admin | admin@dealxin.local | admin123 |
+| User | demo@dealxin.local | user1234 |
+| User | anh.nguyen@email.com | user1234 |
+| User | minh.tran@email.com | user1234 |
 
 ### Test Categories
 

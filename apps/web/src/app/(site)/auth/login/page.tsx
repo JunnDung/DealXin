@@ -56,9 +56,12 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md space-y-6">
-        <div className="text-center">
+    <div
+      suppressHydrationWarning
+      className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-12"
+    >
+      <div suppressHydrationWarning className="w-full max-w-md space-y-6">
+        <div suppressHydrationWarning className="text-center">
           <h1 className="font-jakarta text-2xl font-bold">Đăng nhập</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Chào mừng bạn quay trở lại DealXin
@@ -69,7 +72,7 @@ export default function LoginPage() {
           onSubmit={handleSubmit(onSubmit)}
           className="space-y-4 rounded-xl border border-border bg-card p-6 shadow-sm"
         >
-          <div className="space-y-1.5">
+          <div suppressHydrationWarning className="space-y-1.5">
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
@@ -83,9 +86,9 @@ export default function LoginPage() {
             )}
           </div>
 
-          <div className="space-y-1.5">
+          <div suppressHydrationWarning className="space-y-1.5">
             <Label htmlFor="password">Mật khẩu</Label>
-            <div className="relative">
+            <div suppressHydrationWarning className="relative">
               <Input
                 id="password"
                 type={showPassword ? "text" : "password"}
@@ -129,10 +132,13 @@ export default function LoginPage() {
         </p>
 
         {/* Demo credentials */}
-        <div className="rounded-lg border border-border bg-muted/50 p-4 text-xs text-muted-foreground">
-          <p className="font-medium mb-1">Demo:</p>
+        <div
+          suppressHydrationWarning
+          className="rounded-lg border border-border bg-muted/50 p-4 text-xs text-muted-foreground"
+        >
+          <p className="mb-1 font-medium">Demo:</p>
           <p>Admin: admin@dealxin.com / admin123</p>
-          <p>User: demo@dealxin.com / demo123</p>
+          <p>User: demo@dealxin.local / user1234</p>
         </div>
       </div>
     </div>

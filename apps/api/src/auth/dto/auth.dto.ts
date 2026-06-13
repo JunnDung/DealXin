@@ -19,20 +19,32 @@ export class RegisterDto {
   name!: string;
 }
 
-export class LoginDto {
-  @IsEmail()
-  @ApiProperty({ example: "user@email.com" })
-  email!: string;
-
-  @IsString()
-  @ApiProperty()
-  password!: string;
+export interface LoginBody {
+  email?: string;
+  password?: string;
 }
 
 export class RefreshTokenDto {
   @IsString()
   @ApiProperty()
   refreshToken!: string;
+}
+
+export class UserResponseDto {
+  @ApiProperty()
+  id!: string;
+
+  @ApiProperty()
+  email!: string;
+
+  @ApiProperty()
+  fullName!: string;
+
+  @ApiProperty({ enum: ["USER", "ADMIN"] })
+  role!: string;
+
+  @ApiProperty()
+  createdAt!: string;
 }
 
 export class AuthResponseDto {
@@ -47,23 +59,6 @@ export class AuthResponseDto {
 
   @ApiProperty()
   user!: UserResponseDto;
-}
-
-export class UserResponseDto {
-  @ApiProperty()
-  id!: string;
-
-  @ApiProperty()
-  email!: string;
-
-  @ApiProperty()
-  name!: string;
-
-  @ApiProperty({ enum: ["USER", "ADMIN"] })
-  role!: string;
-
-  @ApiProperty()
-  createdAt!: string;
 }
 
 export class MessageResponseDto {

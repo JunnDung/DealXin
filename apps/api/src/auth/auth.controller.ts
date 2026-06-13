@@ -6,8 +6,6 @@ import {
   HttpStatus,
   Post,
   UseGuards,
-  UsePipes,
-  ValidationPipe,
 } from "@nestjs/common";
 import {
   ApiBearerAuth,
@@ -20,7 +18,7 @@ import { type AuthService } from "./auth.service";
 import { type AuthenticatedUser, CurrentUser, Public } from "./decorators";
 import {
   AuthResponseDto,
-  type LoginDto,
+  type LoginBody,
   MessageResponseDto,
   type RefreshTokenDto,
   type RegisterDto,
@@ -30,13 +28,6 @@ import { JwtAuthGuard } from "./guards";
 
 @ApiTags("Authentication")
 @Controller("auth")
-@UsePipes(
-  new ValidationPipe({
-    whitelist: true,
-    forbidNonWhitelisted: true,
-    transform: true,
-  }),
-)
 export class AuthController {
   constructor(private readonly auth: AuthService) {}
 
@@ -45,8 +36,8 @@ export class AuthController {
   @ApiOperation({ summary: "Register a new user account" })
   @ApiResponse({ status: 201, type: AuthResponseDto })
   @ApiResponse({ status: 409, description: "Email already registered" })
-  async register(@Body() dto: RegisterDto): Promise<AuthResponseDto> {
-    return this.auth.register(dto);
+  async register(@Body() dto: RegisterDto): Promise<{ data: AuthResponseDto }> {
+    return { data: await this.auth.register(dto) };
   }
 
   @Public()
@@ -55,8 +46,8 @@ export class AuthController {
   @ApiOperation({ summary: "Login with email and password" })
   @ApiResponse({ status: 200, type: AuthResponseDto })
   @ApiResponse({ status: 401, description: "Invalid credentials" })
-  async login(@Body() dto: LoginDto): Promise<AuthResponseDto> {
-    return this.auth.login(dto);
+  async login(@Body() dto: LoginBody): Promise<{ data: AuthResponseDto }> {
+    return { data: await this.auth.login(dto) };
   }
 
   @Public()
@@ -65,8 +56,10 @@ export class AuthController {
   @ApiOperation({ summary: "Refresh access token using refresh token" })
   @ApiResponse({ status: 200, type: AuthResponseDto })
   @ApiResponse({ status: 401, description: "Invalid or expired refresh token" })
-  async refresh(@Body() dto: RefreshTokenDto): Promise<AuthResponseDto> {
-    return this.auth.refresh(dto.refreshToken);
+  async refresh(
+    @Body() dto: RefreshTokenDto,
+  ): Promise<{ data: AuthResponseDto }> {
+    return { data: await this.auth.refresh(dto.refreshToken) };
   }
 
   @UseGuards(JwtAuthGuard)
@@ -77,9 +70,9 @@ export class AuthController {
   @ApiResponse({ status: 200, type: MessageResponseDto })
   async logout(
     @CurrentUser() user: AuthenticatedUser,
-  ): Promise<MessageResponseDto> {
+  ): Promise<{ data: MessageResponseDto }> {
     await this.auth.logout(user.id);
-    return { message: "Logged out successfully" };
+    return { data: { message: "Logged out successfully" } };
   }
 
   @UseGuards(JwtAuthGuard)
@@ -88,7 +81,9 @@ export class AuthController {
   @ApiOperation({ summary: "Get current authenticated user profile" })
   @ApiResponse({ status: 200, type: UserResponseDto })
   @ApiResponse({ status: 401, description: "Not authenticated" })
-  async me(@CurrentUser() user: AuthenticatedUser): Promise<UserResponseDto> {
-    return this.auth.getProfile(user.id);
+  async me(
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<{ data: UserResponseDto }> {
+    return { data: await this.auth.getProfile(user.id) };
   }
 }
