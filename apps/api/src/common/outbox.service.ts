@@ -1,10 +1,11 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 
+import { PRISMA_SERVICE } from "../prisma/prisma.constants";
 import { type PrismaService } from "../prisma/prisma.service";
 
 @Injectable()
 export class OutboxService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(@Inject(PRISMA_SERVICE) private readonly prisma: PrismaService) {}
 
   async emit(
     aggregateType: string,

@@ -1,11 +1,14 @@
 import {
+  Inject,
   Injectable,
   type OnModuleDestroy,
   type OnModuleInit,
 } from "@nestjs/common";
 
 import { type MessagingService } from "../messaging/messaging.service";
+import { PRISMA_SERVICE } from "../prisma/prisma.constants";
 import { type PrismaService } from "../prisma/prisma.service";
+import { MESSAGING_SERVICE } from "./di-tokens";
 import { logger } from "./logger/pino.logger";
 
 @Injectable()
@@ -15,7 +18,8 @@ export class OutboxPublisherService implements OnModuleInit, OnModuleDestroy {
   private timeoutHandle: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
-    private readonly prisma: PrismaService,
+    @Inject(PRISMA_SERVICE) private readonly prisma: PrismaService,
+    @Inject(MESSAGING_SERVICE)
     private readonly messagingService: MessagingService,
   ) {}
 

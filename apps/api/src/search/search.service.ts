@@ -1,5 +1,6 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 
+import { PRISMA_SERVICE } from "../prisma/prisma.constants";
 import { type PrismaService } from "../prisma/prisma.service";
 import { type MeilisearchService } from "./meilisearch.service";
 
@@ -20,7 +21,7 @@ export class SearchService {
 
   constructor(
     private readonly meilisearch: MeilisearchService,
-    private readonly prisma: PrismaService,
+    @Inject(PRISMA_SERVICE) private readonly prisma: PrismaService,
   ) {}
 
   async searchDeals(options: SearchDealsOptions) {

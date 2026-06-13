@@ -1,6 +1,7 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import { type Prisma } from "@prisma/client";
 
+import { PRISMA_SERVICE } from "../../prisma/prisma.constants";
 import { type PrismaService } from "../../prisma/prisma.service";
 import {
   type CreateDealData,
@@ -40,7 +41,7 @@ const SELECT_DEAL_FIELDS = {
 
 @Injectable()
 export class PrismaDealRepository implements DealRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(@Inject(PRISMA_SERVICE) private readonly prisma: PrismaService) {}
 
   async create(data: CreateDealData) {
     return this.prisma.deal.create({

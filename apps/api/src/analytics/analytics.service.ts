@@ -1,6 +1,7 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { AnalyticsEventType } from "@prisma/client";
 
+import { PRISMA_SERVICE } from "../prisma/prisma.constants";
 import { type PrismaService } from "../prisma/prisma.service";
 
 interface TrackEventData {
@@ -14,7 +15,7 @@ interface TrackEventData {
 export class AnalyticsService {
   private readonly logger = new Logger(AnalyticsService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(@Inject(PRISMA_SERVICE) private readonly prisma: PrismaService) {}
 
   async trackEvent(data: TrackEventData): Promise<void> {
     try {

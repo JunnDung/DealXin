@@ -8,10 +8,13 @@ import {
 import { type Deal, DealStatus } from "@prisma/client";
 
 import { type AuditLogService } from "../common/audit-log.service";
+import { MESSAGING_SERVICE } from "../common/di-tokens";
+import { AUDIT_LOG_SERVICE } from "../common/di-tokens";
 import { type OutboxService } from "../common/outbox.service";
 import { PaginatedResponse } from "../common/pagination";
 import { type MessagingService } from "../messaging/messaging.service";
 import { Queues } from "../messaging/routing-keys";
+import { PRISMA_SERVICE } from "../prisma/prisma.constants";
 import { type PrismaService } from "../prisma/prisma.service";
 import { DEAL_REPOSITORY, DEAL_STATUS_STRATEGY } from "./deals.tokens";
 import {
@@ -47,12 +50,13 @@ function slugify(text: string): string {
 @Injectable()
 export class DealsService {
   constructor(
-    private readonly prisma: PrismaService,
-    private readonly auditLog: AuditLogService,
+    @Inject(PRISMA_SERVICE) private readonly prisma: PrismaService,
+    @Inject(AUDIT_LOG_SERVICE) private readonly auditLog: AuditLogService,
     @Inject(DEAL_REPOSITORY) private readonly repository: DealRepository,
     @Inject(DEAL_STATUS_STRATEGY)
     private readonly statusTransition: DealStatusTransitionStrategy,
     private readonly outbox: OutboxService,
+    @Inject(MESSAGING_SERVICE)
     private readonly messagingService: MessagingService,
   ) {}
 

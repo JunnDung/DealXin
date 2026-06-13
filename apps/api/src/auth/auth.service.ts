@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  Inject,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -9,6 +10,7 @@ import { type User } from "@prisma/client";
 import * as bcrypt from "bcrypt";
 import * as crypto from "crypto";
 
+import { PRISMA_SERVICE } from "../prisma/prisma.constants";
 import { type PrismaService } from "../prisma/prisma.service";
 import {
   type AuthResponseDto,
@@ -23,7 +25,7 @@ export class AuthService {
   private readonly REFRESH_TOKEN_TTL_DAYS = 7;
 
   constructor(
-    private readonly prisma: PrismaService,
+    @Inject(PRISMA_SERVICE) private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
   ) {}
 

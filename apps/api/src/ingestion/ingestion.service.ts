@@ -1,6 +1,8 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 
 import { type AuditLogService } from "../common/audit-log.service";
+import { AUDIT_LOG_SERVICE } from "../common/di-tokens";
+import { PRISMA_SERVICE } from "../prisma/prisma.constants";
 import { type PrismaService } from "../prisma/prisma.service";
 import { type AdapterFactory } from "./adapters/adapter.factory";
 import { type CsvImportAdapter } from "./adapters/csv-import.adapter";
@@ -26,8 +28,8 @@ export interface ImportResult {
 @Injectable()
 export class IngestionService {
   constructor(
-    private readonly prisma: PrismaService,
-    private readonly auditLog: AuditLogService,
+    @Inject(PRISMA_SERVICE) private readonly prisma: PrismaService,
+    @Inject(AUDIT_LOG_SERVICE) private readonly auditLog: AuditLogService,
     private readonly adapterFactory: AdapterFactory,
     private readonly csvAdapter: CsvImportAdapter,
     private readonly jsonAdapter: JsonImportAdapter,

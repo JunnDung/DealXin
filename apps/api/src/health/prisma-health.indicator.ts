@@ -1,17 +1,18 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 import {
   HealthCheck,
   type HealthCheckResult,
   type HealthCheckService as NestHealthCheckService,
 } from "@nestjs/terminus";
 
+import { PRISMA_SERVICE } from "../prisma/prisma.constants";
 import { type PrismaService } from "../prisma/prisma.service";
 
 @Injectable()
 export class PrismaHealthIndicator {
   constructor(
     private readonly health: NestHealthCheckService,
-    private readonly prisma: PrismaService,
+    @Inject(PRISMA_SERVICE) private readonly prisma: PrismaService,
   ) {}
 
   @HealthCheck()

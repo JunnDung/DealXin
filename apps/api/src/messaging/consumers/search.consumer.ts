@@ -1,17 +1,19 @@
-import { Injectable, Logger, type OnModuleInit } from "@nestjs/common";
+import { Inject, Injectable, Logger, type OnModuleInit } from "@nestjs/common";
 
+import { MESSAGING_SERVICE } from "../../common/di-tokens";
+import { type MessagingService } from "../../messaging/messaging.service";
+import { Queues } from "../../messaging/routing-keys";
 import {
   type DealDocument,
   type MeilisearchService,
 } from "../../search/meilisearch.service";
-import { type MessagingService } from "../messaging.service";
-import { Queues } from "../routing-keys";
 
 @Injectable()
 export class SearchConsumer implements OnModuleInit {
   private readonly logger = new Logger(SearchConsumer.name);
 
   constructor(
+    @Inject(MESSAGING_SERVICE)
     private readonly messagingService: MessagingService,
     private readonly meilisearchService: MeilisearchService,
   ) {}

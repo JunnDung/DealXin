@@ -1,16 +1,19 @@
-import { Injectable, Logger, type OnModuleInit } from "@nestjs/common";
+import { Inject, Injectable, Logger, type OnModuleInit } from "@nestjs/common";
 
+import { MESSAGING_SERVICE } from "../../common/di-tokens";
+import { Queues } from "../../messaging/routing-keys";
+import { PRISMA_SERVICE } from "../../prisma/prisma.constants";
 import { type PrismaService } from "../../prisma/prisma.service";
 import { type MessagingService } from "../messaging.service";
-import { Queues } from "../routing-keys";
 
 @Injectable()
 export class NotificationConsumer implements OnModuleInit {
   private readonly logger = new Logger(NotificationConsumer.name);
 
   constructor(
+    @Inject(MESSAGING_SERVICE)
     private readonly messagingService: MessagingService,
-    private readonly prisma: PrismaService,
+    @Inject(PRISMA_SERVICE) private readonly prisma: PrismaService,
   ) {}
 
   async onModuleInit() {

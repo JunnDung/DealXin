@@ -1,6 +1,7 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import { type Notification, type NotificationType } from "@prisma/client";
 
+import { PRISMA_SERVICE } from "../prisma/prisma.constants";
 import { type PrismaService } from "../prisma/prisma.service";
 import {
   type NotificationDto,
@@ -18,7 +19,7 @@ export interface CreateNotificationData {
 
 @Injectable()
 export class NotificationService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(@Inject(PRISMA_SERVICE) private readonly prisma: PrismaService) {}
 
   async getNotifications(
     userId: string,

@@ -1,5 +1,6 @@
-import { Injectable } from "@nestjs/common";
+import { Inject, Injectable } from "@nestjs/common";
 
+import { PRISMA_SERVICE } from "../prisma/prisma.constants";
 import { type PrismaService } from "../prisma/prisma.service";
 
 export interface AuditLogInput {
@@ -14,7 +15,7 @@ export interface AuditLogInput {
 
 @Injectable()
 export class AuditLogService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(@Inject(PRISMA_SERVICE) private readonly prisma: PrismaService) {}
 
   async log(input: AuditLogInput): Promise<void> {
     const data: {
