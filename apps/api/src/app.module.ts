@@ -6,7 +6,6 @@ import { AnalyticsModule } from "./analytics/analytics.module";
 import { AuthModule } from "./auth/auth.module";
 import { JwtAuthGuard } from "./auth/guards/jwt-auth.guard";
 import { CommonModule } from "./common/common.module";
-import { OutboxModule } from "./common/outbox.module";
 import { AppConfigModule } from "./config/config.module";
 import { DealsModule } from "./deals/deals.module";
 import { HealthModule } from "./health/health.module";
@@ -26,7 +25,7 @@ import { SearchModule } from "./search/search.module";
     PrismaModule,
     AuthModule,
     CommonModule,
-    OutboxModule,
+    // OutboxModule removed — OutboxService is optional, injected via @Optional()
     MessagingModule,
     DealsModule,
     IngestionModule,

@@ -160,16 +160,31 @@ export class ApiError extends Error {
 
 // ─── Auth ───────────────────────────────────────────────────────────────────
 
+export interface AuthTokens {
+  accessToken: string;
+  refreshToken: string;
+}
+
 export const authApi = {
   login: (body: { email: string; password: string }) =>
-    apiFetch<{ user: UserResponse; tokens: TokenPair }>("/api/auth/login", {
+    apiFetch<{
+      accessToken: string;
+      refreshToken: string;
+      expiresIn: number;
+      user: UserResponse;
+    }>("/api/auth/login", {
       method: "POST",
       body: JSON.stringify(body),
       auth: false,
     }),
 
   register: (body: { email: string; password: string; fullName: string }) =>
-    apiFetch<{ user: UserResponse; tokens: TokenPair }>("/api/auth/register", {
+    apiFetch<{
+      accessToken: string;
+      refreshToken: string;
+      expiresIn: number;
+      user: UserResponse;
+    }>("/api/auth/register", {
       method: "POST",
       body: JSON.stringify(body),
       auth: false,

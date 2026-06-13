@@ -56,9 +56,15 @@ function HotDealsSection() {
   });
 
   return (
-    <section className="bg-secondary/20 py-16">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+    <section suppressHydrationWarning className="bg-secondary/20 py-16">
+      <div
+        suppressHydrationWarning
+        className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"
+      >
+        <div
+          suppressHydrationWarning
+          className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between"
+        >
           <div>
             <h2 className="font-jakarta text-2xl font-bold">Deal Hot Nhất</h2>
             <p className="mt-1 text-sm text-muted-foreground">
@@ -74,14 +80,18 @@ function HotDealsSection() {
         </div>
 
         {isLoading ? (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div
+            suppressHydrationWarning
+            className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+          >
             {Array.from({ length: 4 }).map((_, i) => (
               <div
+                suppressHydrationWarning
                 key={i}
                 className="overflow-hidden rounded-xl border border-border bg-card"
               >
                 <Skeleton className="aspect-[16/9] w-full rounded-none" />
-                <div className="space-y-2 p-4">
+                <div suppressHydrationWarning className="space-y-2 p-4">
                   <Skeleton className="h-4 w-3/4" />
                   <Skeleton className="h-5 w-1/2" />
                 </div>
@@ -89,7 +99,10 @@ function HotDealsSection() {
             ))}
           </div>
         ) : hotDeals && hotDeals.data.length > 0 ? (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div
+            suppressHydrationWarning
+            className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+          >
             {hotDeals.data.map((deal) => (
               <DealCard key={deal.id} deal={deal} />
             ))}
@@ -97,7 +110,10 @@ function HotDealsSection() {
         ) : (
           <Card className="border-primary/20 bg-primary/5">
             <CardContent className="flex flex-col items-center py-12 text-center">
-              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
+              <div
+                suppressHydrationWarning
+                className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10"
+              >
                 <Compass className="h-7 w-7 text-primary" />
               </div>
               <h3 className="mb-2 text-lg font-semibold text-foreground">
@@ -122,19 +138,29 @@ function HotDealsSection() {
 
 export default function HomePage() {
   return (
-    <div className="flex flex-col">
+    <div suppressHydrationWarning className="flex flex-col">
       {/* ─── Hero ─── */}
-      <section className="relative overflow-hidden bg-background">
+      <section
+        suppressHydrationWarning
+        className="relative overflow-hidden bg-background"
+      >
         {/* Decorative oversized text — background element */}
         <div
+          suppressHydrationWarning
           aria-hidden="true"
           className="pointer-events-none absolute right-0 top-0 select-none text-[clamp(8rem,20vw,16rem)] font-bold leading-none text-foreground/[0.03] dark:text-foreground/[0.04]"
         >
           XIN
         </div>
 
-        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-2">
+        <div
+          suppressHydrationWarning
+          className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8"
+        >
+          <div
+            suppressHydrationWarning
+            className="grid grid-cols-1 items-start gap-12 lg:grid-cols-2"
+          >
             {/* Left: Copy — left-aligned, breaking the centered axis */}
             <div className="space-y-7">
               <Badge variant="secondary" className="text-sm font-medium">

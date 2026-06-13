@@ -12,7 +12,6 @@ import * as crypto from "crypto";
 import { type PrismaService } from "../prisma/prisma.service";
 import {
   type AuthResponseDto,
-  type LoginDto,
   type RegisterDto,
   type UserResponseDto,
 } from "./dto";
@@ -49,7 +48,13 @@ export class AuthService {
     return this.issueTokens(user);
   }
 
-  async login(dto: LoginDto): Promise<AuthResponseDto> {
+  async login(dto: {
+    email?: string;
+    password?: string;
+  }): Promise<AuthResponseDto> {
+    if (!dto?.email) {
+      throw new Error("Email is required");
+    }
     const user = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
@@ -58,7 +63,7 @@ export class AuthService {
       throw new UnauthorizedException("Invalid credentials");
     }
 
-    const isPasswordValid = await bcrypt.compare(dto.password, user.password);
+    const isPasswordValid = await bcrypt.compare(dto.password!, user.password);
     if (!isPasswordValid) {
       throw new UnauthorizedException("Invalid credentials");
     }
@@ -109,7 +114,7 @@ export class AuthService {
     return {
       id: user.id,
       email: user.email,
-      name: user.name,
+      fullName: user.name,
       role: user.role,
       createdAt: user.createdAt.toISOString(),
     };
@@ -143,7 +148,7 @@ export class AuthService {
       user: {
         id: user.id,
         email: user.email,
-        name: user.name,
+        fullName: user.name,
         role: user.role,
         createdAt: user.createdAt.toISOString(),
       },

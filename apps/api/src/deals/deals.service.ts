@@ -1,14 +1,18 @@
 import {
   BadRequestException,
   ForbiddenException,
+  Inject,
   Injectable,
   NotFoundException,
+  Optional,
 } from "@nestjs/common";
 import { type Deal, DealStatus } from "@prisma/client";
 
 import { type AuditLogService } from "../common/audit-log.service";
 import { type OutboxService } from "../common/outbox.service";
 import { PaginatedResponse } from "../common/pagination";
+import { type MessagingService } from "../messaging/messaging.service";
+import { Queues } from "../messaging/routing-keys";
 import { type PrismaService } from "../prisma/prisma.service";
 import {
   type CreateDealDto,
@@ -18,13 +22,12 @@ import {
 } from "./dto";
 import {
   type CreateDealData,
+  DEAL_REPOSITORY,
   type DealFilterParams,
   type DealRepository,
   type DealStatusTransitionStrategy,
   DefaultDealScoringStrategy,
 } from "./strategies";
-import { MessagingService } from "../messaging/messaging.service";
-import { Queues } from "../messaging/routing-keys";
 
 function slugify(text: string): string {
   return text
@@ -47,10 +50,10 @@ export class DealsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly auditLog: AuditLogService,
-    private readonly repository: DealRepository,
+    @Inject(DEAL_REPOSITORY) private readonly repository: DealRepository,
     private readonly statusTransition: DealStatusTransitionStrategy,
-    private readonly outbox: OutboxService,
-    private readonly messagingService: MessagingService,
+    @Optional() private readonly outbox?: OutboxService,
+    private readonly messagingService?: MessagingService,
   ) {}
 
   async createDeal(
@@ -84,7 +87,7 @@ export class DealsService {
       metadata: { title: deal.title, platform: deal.platform },
     });
 
-    await this.outbox.emit("Deal", deal.id, "DealSubmitted", {
+    await this.outbox?.emit("Deal", deal.id, "DealSubmitted", {
       eventId: crypto.randomUUID(),
       eventType: "DealSubmitted",
       occurredAt: new Date().toISOString(),
@@ -103,7 +106,7 @@ export class DealsService {
       },
     });
 
-    await this.messagingService.publish(Queues.ANALYTICS, {
+    await this.messagingService?.publish(Queues.ANALYTICS, {
       eventType: "DEAL_SUBMITTED",
       dealId: deal.id,
       userId,
@@ -180,7 +183,7 @@ export class DealsService {
 
     await this.repository.incrementViewCount(id);
 
-    await this.messagingService.publish(Queues.ANALYTICS, {
+    await this.messagingService?.publish(Queues.ANALYTICS, {
       eventType: "PAGE_VIEW",
       dealId: deal.id,
       userId,
@@ -217,7 +220,7 @@ export class DealsService {
 
     await this.repository.incrementViewCount(deal.id);
 
-    await this.messagingService.publish(Queues.ANALYTICS, {
+    await this.messagingService?.publish(Queues.ANALYTICS, {
       eventType: "PAGE_VIEW",
       dealId: deal.id,
       userId,
@@ -308,7 +311,7 @@ export class DealsService {
       metadata: { title: deal.title, platform: deal.platform },
     });
 
-    await this.outbox.emit("Deal", id, "DealApproved", {
+    await this.outbox?.emit("Deal", id, "DealApproved", {
       eventId: crypto.randomUUID(),
       eventType: "DealApproved",
       occurredAt: new Date().toISOString(),
@@ -329,7 +332,7 @@ export class DealsService {
       },
     });
 
-    await this.messagingService.publish(Queues.ANALYTICS, {
+    await this.messagingService?.publish(Queues.ANALYTICS, {
       eventType: "DEAL_APPROVED",
       dealId: deal.id,
       userId: adminId,
@@ -370,7 +373,7 @@ export class DealsService {
       metadata: { title: deal.title, reason },
     });
 
-    await this.outbox.emit("Deal", id, "DealRejected", {
+    await this.outbox?.emit("Deal", id, "DealRejected", {
       eventId: crypto.randomUUID(),
       eventType: "DealRejected",
       occurredAt: new Date().toISOString(),
@@ -391,7 +394,7 @@ export class DealsService {
       },
     });
 
-    await this.messagingService.publish(Queues.ANALYTICS, {
+    await this.messagingService?.publish(Queues.ANALYTICS, {
       eventType: "DEAL_REJECTED",
       dealId: deal.id,
       userId: adminId,
@@ -429,7 +432,7 @@ export class DealsService {
       metadata: { title: deal.title },
     });
 
-    await this.outbox.emit("Deal", id, "DealExpired", {
+    await this.outbox?.emit("Deal", id, "DealExpired", {
       eventId: crypto.randomUUID(),
       eventType: "DealExpired",
       occurredAt: new Date().toISOString(),
@@ -482,7 +485,7 @@ export class DealsService {
       metadata: { value },
     });
 
-    await this.messagingService.publish(Queues.ANALYTICS, {
+    await this.messagingService?.publish(Queues.ANALYTICS, {
       eventType: value === 1 ? "DEAL_UPVOTE" : "DEAL_DOWNVOTE",
       dealId,
       userId,
@@ -531,7 +534,7 @@ export class DealsService {
       entityId: dealId,
     });
 
-    await this.messagingService.publish(Queues.ANALYTICS, {
+    await this.messagingService?.publish(Queues.ANALYTICS, {
       eventType: "DEAL_BOOKMARK",
       dealId,
       userId,

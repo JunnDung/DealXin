@@ -39,7 +39,7 @@ const sortOptions = [
 ];
 
 const platformOptions = [
-  { value: "", label: "Tất cả nền tảng" },
+  { value: "all", label: "Tất cả nền tảng" },
   { value: "SHOPEE", label: "Shopee" },
   { value: "LAZADA", label: "Lazada" },
   { value: "TIKTOK_SHOP", label: "TikTok Shop" },
@@ -171,11 +171,11 @@ function DealsContent() {
         </Select>
 
         <Select
-          value={parameters.platform || ""}
+          value={parameters.platform || "all"}
           onValueChange={(v) => {
             const url = new URL(window.location.href);
-            if (v) url.searchParams.set("platform", v);
-            else url.searchParams.delete("platform");
+            if (v === "all") url.searchParams.delete("platform");
+            else url.searchParams.set("platform", v);
             window.history.pushState({}, "", url.toString());
             queryClient.invalidateQueries({ queryKey: ["deals"] });
           }}

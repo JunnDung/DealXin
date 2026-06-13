@@ -116,7 +116,10 @@ export default function DealDetailPage({ params }: DealDetailPageProps) {
 
   if (isError) {
     return (
-      <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+      <div
+        suppressHydrationWarning
+        className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8"
+      >
         <Button variant="ghost" size="sm" className="mb-6 -ml-2" asChild>
           <Link href="/deals">
             <ArrowLeft className="mr-1.5 h-4 w-4" />
@@ -125,7 +128,10 @@ export default function DealDetailPage({ params }: DealDetailPageProps) {
         </Button>
         <Card className="border-red-200 bg-red-50/50 dark:border-red-900 dark:bg-red-950/20">
           <CardContent className="flex flex-col items-center py-16 text-center">
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/50">
+            <div
+              suppressHydrationWarning
+              className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/50"
+            >
               <AlertCircle className="h-8 w-8 text-red-600 dark:text-red-400" />
             </div>
             <h2 className="mb-2 text-xl font-bold text-foreground">
@@ -135,7 +141,10 @@ export default function DealDetailPage({ params }: DealDetailPageProps) {
               Deal có thể đã bị xóa hoặc không tồn tại. Hãy quay lại và thử deal
               khác.
             </p>
-            <div className="flex flex-col gap-3 sm:flex-row">
+            <div
+              suppressHydrationWarning
+              className="flex flex-col gap-3 sm:flex-row"
+            >
               <Button onClick={() => router.refresh()} className="gap-2">
                 <RefreshCw className="h-4 w-4" />
                 Thử lại
@@ -158,7 +167,10 @@ export default function DealDetailPage({ params }: DealDetailPageProps) {
   const isHot = deal.score >= 80 || deal.upvoteCount >= 50;
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+    <div
+      suppressHydrationWarning
+      className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8"
+    >
       {/* Back */}
       <Button variant="ghost" size="sm" className="mb-6 -ml-2" asChild>
         <Link href="/deals">
@@ -167,12 +179,18 @@ export default function DealDetailPage({ params }: DealDetailPageProps) {
         </Link>
       </Button>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <div
+        suppressHydrationWarning
+        className="grid grid-cols-1 gap-6 lg:grid-cols-3"
+      >
         {/* Left: Main info */}
-        <div className="lg:col-span-2 space-y-5">
+        <div suppressHydrationWarning className="lg:col-span-2 space-y-5">
           {/* Image */}
           {deal.imageUrl && (
-            <div className="overflow-hidden rounded-xl border border-border">
+            <div
+              suppressHydrationWarning
+              className="overflow-hidden rounded-xl border border-border"
+            >
               <img
                 src={deal.imageUrl}
                 alt={deal.title}
@@ -183,7 +201,7 @@ export default function DealDetailPage({ params }: DealDetailPageProps) {
           )}
 
           {/* Badges */}
-          <div className="flex flex-wrap gap-2">
+          <div suppressHydrationWarning className="flex flex-wrap gap-2">
             <Badge className="bg-orange-500 text-white">
               <ShoppingBag className="mr-1 h-3 w-3" />
               {platformLabels[deal.platform]}
@@ -223,8 +241,11 @@ export default function DealDetailPage({ params }: DealDetailPageProps) {
           )}
 
           {/* Price section */}
-          <div className="rounded-xl border border-border bg-card p-5">
-            <div className="flex items-baseline gap-3">
+          <div
+            suppressHydrationWarning
+            className="rounded-xl border border-border bg-card p-5"
+          >
+            <div suppressHydrationWarning className="flex items-baseline gap-3">
               <span className="font-jakarta text-4xl font-bold text-primary">
                 {formatPrice(deal.salePrice, deal.currency)}
               </span>
@@ -241,11 +262,14 @@ export default function DealDetailPage({ params }: DealDetailPageProps) {
             </div>
 
             {deal.couponCode && (
-              <div className="mt-4">
+              <div suppressHydrationWarning className="mt-4">
                 <p className="text-sm text-muted-foreground mb-1.5">
                   Mã giảm giá:
                 </p>
-                <div className="inline-flex items-center gap-2 rounded-lg border-2 border-dashed border-primary bg-primary/5 px-4 py-2">
+                <div
+                  suppressHydrationWarning
+                  className="inline-flex items-center gap-2 rounded-lg border-2 border-dashed border-primary bg-primary/5 px-4 py-2"
+                >
                   <code className="font-mono text-lg font-bold text-primary">
                     {deal.couponCode}
                   </code>
@@ -273,14 +297,21 @@ export default function DealDetailPage({ params }: DealDetailPageProps) {
 
           {/* Price history */}
           {deal.priceHistory && deal.priceHistory.length > 1 && (
-            <div className="rounded-xl border border-border bg-card p-5">
+            <div
+              suppressHydrationWarning
+              className="rounded-xl border border-border bg-card p-5"
+            >
               <h3 className="font-semibold mb-3">Lịch sử giá</h3>
-              <div className="space-y-1">
+              <div suppressHydrationWarning className="space-y-1">
                 {deal.priceHistory
                   .slice()
                   .reverse()
                   .map((entry, i) => (
-                    <div key={i} className="flex justify-between text-sm">
+                    <div
+                      suppressHydrationWarning
+                      key={i}
+                      className="flex justify-between text-sm"
+                    >
                       <span className="text-muted-foreground">
                         {formatDate(entry.recordedAt)}
                       </span>
@@ -295,9 +326,12 @@ export default function DealDetailPage({ params }: DealDetailPageProps) {
         </div>
 
         {/* Right: Sidebar */}
-        <div className="space-y-4">
+        <div suppressHydrationWarning className="space-y-4">
           {/* Stats — editorial fact sheet */}
-          <div className="rounded-xl border border-border bg-card p-5">
+          <div
+            suppressHydrationWarning
+            className="rounded-xl border border-border bg-card p-5"
+          >
             <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Thông tin
             </p>
@@ -344,11 +378,14 @@ export default function DealDetailPage({ params }: DealDetailPageProps) {
           </div>
 
           {/* Community score */}
-          <div className="rounded-xl border border-border bg-card p-5">
+          <div
+            suppressHydrationWarning
+            className="rounded-xl border border-border bg-card p-5"
+          >
             <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Cộng đồng đánh giá
             </p>
-            <div className="flex gap-3">
+            <div suppressHydrationWarning className="flex gap-3">
               <button
                 className="flex flex-1 flex-col items-center gap-1 rounded-lg border border-border bg-card p-3 transition-colors hover:bg-green-50 hover:border-green-200 dark:hover:bg-green-950/30"
                 onClick={() =>
@@ -416,7 +453,10 @@ export default function DealDetailPage({ params }: DealDetailPageProps) {
 
           {/* Source */}
           {deal.source && (
-            <div className="rounded-xl border border-border bg-card p-5">
+            <div
+              suppressHydrationWarning
+              className="rounded-xl border border-border bg-card p-5"
+            >
               <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Nguồn
               </p>
@@ -426,7 +466,10 @@ export default function DealDetailPage({ params }: DealDetailPageProps) {
 
           {/* Creator */}
           {deal.creator && (
-            <div className="rounded-xl border border-border bg-card p-5">
+            <div
+              suppressHydrationWarning
+              className="rounded-xl border border-border bg-card p-5"
+            >
               <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Người đăng
               </p>
@@ -441,14 +484,23 @@ export default function DealDetailPage({ params }: DealDetailPageProps) {
 
 function DealDetailSkeleton() {
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
-      <Skeleton className="h-9 w-28 mb-6" />
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-4">
+    <div
+      suppressHydrationWarning
+      className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8"
+    >
+      <Skeleton suppressHydrationWarning className="h-9 w-28 mb-6" />
+      <div
+        suppressHydrationWarning
+        className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+      >
+        <div suppressHydrationWarning className="lg:col-span-2 space-y-4">
           {/* Image */}
-          <Skeleton className="w-full h-80 rounded-xl" />
+          <Skeleton
+            suppressHydrationWarning
+            className="w-full h-80 rounded-xl"
+          />
           {/* Badges */}
-          <div className="flex gap-2">
+          <div suppressHydrationWarning className="flex gap-2">
             <Skeleton className="h-6 w-24 rounded-full" />
             <Skeleton className="h-6 w-20 rounded-full" />
           </div>
@@ -456,16 +508,16 @@ function DealDetailSkeleton() {
           <Skeleton className="h-10 w-full" />
           <Skeleton className="h-6 w-3/4" />
           {/* Description */}
-          <Skeleton className="h-20 w-full" />
+          <Skeleton suppressHydrationWarning className="h-20 w-full" />
           {/* Price section */}
-          <Skeleton className="h-40 rounded-xl" />
+          <Skeleton suppressHydrationWarning className="h-40 rounded-xl" />
           {/* Price history */}
-          <Skeleton className="h-32 rounded-xl" />
+          <Skeleton suppressHydrationWarning className="h-32 rounded-xl" />
         </div>
-        <div className="space-y-4">
-          <Skeleton className="h-48 rounded-xl" />
-          <Skeleton className="h-56 rounded-xl" />
-          <Skeleton className="h-24 rounded-xl" />
+        <div suppressHydrationWarning className="space-y-4">
+          <Skeleton suppressHydrationWarning className="h-48 rounded-xl" />
+          <Skeleton suppressHydrationWarning className="h-56 rounded-xl" />
+          <Skeleton suppressHydrationWarning className="h-24 rounded-xl" />
         </div>
       </div>
     </div>

@@ -1,3 +1,5 @@
+export const DEAL_REPOSITORY = Symbol("DEAL_REPOSITORY");
+
 export type {
   CreateDealData,
   DealFilterParams,

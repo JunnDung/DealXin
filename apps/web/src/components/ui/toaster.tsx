@@ -17,8 +17,8 @@ export function Toaster() {
     <ToastProvider>
       {toasts.map(function ({ id, title, description, action, ...properties }) {
         return (
-          <Toast key={id} {...properties}>
-            <div className="grid gap-1">
+          <Toast suppressHydrationWarning key={id} {...properties}>
+            <div suppressHydrationWarning className="grid gap-1">
               {title && <ToastTitle>{title}</ToastTitle>}
               {description && (
                 <ToastDescription>{description}</ToastDescription>
@@ -29,7 +29,7 @@ export function Toaster() {
           </Toast>
         );
       })}
-      <ToastViewport />
+      <ToastViewport suppressHydrationWarning />
     </ToastProvider>
   );
 }

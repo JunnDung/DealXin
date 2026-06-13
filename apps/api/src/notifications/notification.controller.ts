@@ -20,21 +20,21 @@ import {
 
 import { type AuthenticatedUser, CurrentUser } from "../auth/decorators";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
-import { NotificationService } from "./notification.service";
 import {
   NotificationDto,
-  NotificationQueryDto,
   NotificationListDto,
+  type NotificationQueryDto,
   UnreadCountDto,
 } from "./dto/notification.dto";
+import { type NotificationService } from "./notification.service";
 
 @ApiTags("Notifications")
-@Controller("api/notifications")
+@Controller("notifications")
 @UsePipes(
   new ValidationPipe({
     whitelist: true,
-    forbidNonWhitelisted: true,
-    transform: true,
+    forbidNonWhitelisted: false,
+    transform: false,
   }),
 )
 @UseGuards(JwtAuthGuard)
@@ -48,8 +48,10 @@ export class NotificationController {
   async getNotifications(
     @CurrentUser() user: AuthenticatedUser,
     @Query() query: NotificationQueryDto,
-  ): Promise<NotificationListDto> {
-    return this.notificationService.getNotifications(user.id, query);
+  ): Promise<{ data: NotificationListDto }> {
+    return {
+      data: await this.notificationService.getNotifications(user.id, query),
+    };
   }
 
   @Get("unread-count")
@@ -57,9 +59,9 @@ export class NotificationController {
   @ApiResponse({ status: 200, type: UnreadCountDto })
   async getUnreadCount(
     @CurrentUser() user: AuthenticatedUser,
-  ): Promise<UnreadCountDto> {
+  ): Promise<{ data: UnreadCountDto }> {
     const count = await this.notificationService.getUnreadCount(user.id);
-    return { unreadCount: count };
+    return { data: { unreadCount: count } };
   }
 
   @Patch(":id/read")
@@ -70,8 +72,8 @@ export class NotificationController {
   async markAsRead(
     @CurrentUser() user: AuthenticatedUser,
     @Param("id") id: string,
-  ): Promise<NotificationDto> {
-    return this.notificationService.markAsRead(user.id, id);
+  ): Promise<{ data: NotificationDto }> {
+    return { data: await this.notificationService.markAsRead(user.id, id) };
   }
 
   @Patch("read-all")
@@ -80,8 +82,8 @@ export class NotificationController {
   @ApiResponse({ status: 200 })
   async markAllAsRead(
     @CurrentUser() user: AuthenticatedUser,
-  ): Promise<{ updated: number }> {
-    return this.notificationService.markAllAsRead(user.id);
+  ): Promise<{ data: { updated: number } }> {
+    return { data: await this.notificationService.markAllAsRead(user.id) };
   }
 
   @Delete(":id")

@@ -1,5 +1,6 @@
 import { Module } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import { Reflector } from "@nestjs/core";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
 
@@ -31,7 +32,13 @@ import { JwtRefreshStrategy } from "./strategies/jwt-refresh.strategy";
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, JwtRefreshStrategy, RolesGuard],
+  providers: [
+    AuthService,
+    JwtStrategy,
+    JwtRefreshStrategy,
+    RolesGuard,
+    Reflector,
+  ],
   exports: [AuthService],
 })
 export class AuthModule {}

@@ -1,20 +1,23 @@
 import { Module } from "@nestjs/common";
 
 import { AuditLogService } from "../common/audit-log.service";
-import { OutboxService } from "../common/outbox.service";
+import { PrismaModule } from "../prisma/prisma.module";
 import { DealsController } from "./deals.controller";
 import { DealsService } from "./deals.service";
 import { PrismaDealRepository } from "./repositories/prisma-deal.repository";
-import { DealStatusTransitionStrategy } from "./strategies";
+import { DEAL_REPOSITORY, DealStatusTransitionStrategy } from "./strategies";
 
 @Module({
+  imports: [PrismaModule],
   controllers: [DealsController],
   providers: [
     DealsService,
-    PrismaDealRepository,
+    {
+      provide: DEAL_REPOSITORY,
+      useClass: PrismaDealRepository,
+    },
     DealStatusTransitionStrategy,
     AuditLogService,
-    OutboxService,
   ],
   exports: [DealsService],
 })

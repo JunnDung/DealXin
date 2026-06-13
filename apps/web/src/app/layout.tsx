@@ -4,7 +4,6 @@ import type { Metadata } from "next";
 import { Be_Vietnam_Pro, Plus_Jakarta_Sans } from "next/font/google";
 
 import { Providers } from "@/components/providers";
-import { Toaster } from "@/components/ui/toaster";
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -44,10 +43,10 @@ export default function RootLayout({
   return (
     <html lang="vi" suppressHydrationWarning>
       <body
+        suppressHydrationWarning
         className={`${jakarta.variable} ${beVietnam.variable} font-sans antialiased`}
       >
         <Providers>{children}</Providers>
-        <Toaster />
       </body>
     </html>
   );

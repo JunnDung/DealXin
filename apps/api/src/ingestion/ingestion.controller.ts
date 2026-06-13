@@ -1,33 +1,33 @@
 import {
-  Controller,
-  Post,
-  Get,
   Body,
-  Param,
-  Query,
-  UseInterceptors,
-  UploadedFile,
-  UseGuards,
-  ParseFilePipe,
-  MaxFileSizeValidator,
+  Controller,
+  Get,
   HttpCode,
   HttpStatus,
+  MaxFileSizeValidator,
+  Param,
+  ParseFilePipe,
+  Post,
+  Query,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import {
-  ApiTags,
   ApiBearerAuth,
-  ApiConsumes,
   ApiBody,
+  ApiConsumes,
   ApiResponse,
+  ApiTags,
 } from "@nestjs/swagger";
 
-import { IngestionService } from "./ingestion.service";
-import { ImportResultDto, PaginatedJobsDto, CrawlerJobDto } from "./dto";
+import { type AuthenticatedUser, CurrentUser } from "../auth/decorators";
+import { Roles } from "../auth/decorators/roles.decorator";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
-import { Roles } from "../auth/decorators/roles.decorator";
-import { CurrentUser, type AuthenticatedUser } from "../auth/decorators";
+import { CrawlerJobDto, ImportResultDto, PaginatedJobsDto } from "./dto";
+import { type IngestionService } from "./ingestion.service";
 
 interface MulterFile {
   buffer: Buffer;
@@ -39,7 +39,7 @@ interface MulterFile {
 }
 
 @ApiTags("ingestion")
-@Controller("api/ingestion")
+@Controller("ingestion")
 export class IngestionController {
   constructor(private readonly ingestionService: IngestionService) {}
 
@@ -68,13 +68,13 @@ export class IngestionController {
     file: MulterFile,
     @Body("sourceId") sourceId: string | undefined,
     @CurrentUser() user: AuthenticatedUser,
-  ) {
+  ): Promise<{ data: unknown }> {
     const result = await this.ingestionService.importJson(
       file.buffer,
       sourceId,
       user.id,
     );
-    return { success: true, data: result };
+    return { data: result };
   }
 
   @Post("import/csv")
@@ -102,13 +102,13 @@ export class IngestionController {
     file: MulterFile,
     @Body("sourceId") sourceId: string | undefined,
     @CurrentUser() user: AuthenticatedUser,
-  ) {
+  ): Promise<{ data: unknown }> {
     const result = await this.ingestionService.importCsv(
       file.buffer,
       sourceId,
       user.id,
     );
-    return { success: true, data: result };
+    return { data: result };
   }
 
   @Post("crawl/:sourceType")
@@ -122,7 +122,7 @@ export class IngestionController {
     @Query("page") page: number | undefined,
     @Query("limit") limit: number | undefined,
     @CurrentUser() user: AuthenticatedUser,
-  ) {
+  ): Promise<{ data: unknown }> {
     const options: { page?: number; limit?: number } = {};
     if (page !== undefined) options.page = page;
     if (limit !== undefined) options.limit = limit;
@@ -131,7 +131,7 @@ export class IngestionController {
       user.id,
       options,
     );
-    return { success: true, data: result };
+    return { data: result };
   }
 
   @Get("jobs")
@@ -139,9 +139,12 @@ export class IngestionController {
   @Roles("ADMIN")
   @ApiBearerAuth()
   @ApiResponse({ type: PaginatedJobsDto })
-  async getJobs(@Query("page") page = 1, @Query("limit") limit = 20) {
+  async getJobs(
+    @Query("page") page = 1,
+    @Query("limit") limit = 20,
+  ): Promise<{ data: unknown; meta: unknown }> {
     const result = await this.ingestionService.getJobs(+page, +limit);
-    return { success: true, data: result.data, meta: result.meta };
+    return { data: result.data, meta: result.meta };
   }
 
   @Get("jobs/:id")
@@ -149,8 +152,8 @@ export class IngestionController {
   @Roles("ADMIN")
   @ApiBearerAuth()
   @ApiResponse({ type: CrawlerJobDto })
-  async getJob(@Param("id") id: string) {
+  async getJob(@Param("id") id: string): Promise<{ data: unknown }> {
     const job = await this.ingestionService.getJob(id);
-    return { success: true, data: job };
+    return { data: job };
   }
 }

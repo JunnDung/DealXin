@@ -17,8 +17,7 @@ export class SearchDealsQueryDto {
   maxDiscount?: number;
 
   @ApiPropertyOptional({
-    description:
-      "Sort: newest, discount, hot, price_asc, price_desc",
+    description: "Sort: newest, discount, hot, price_asc, price_desc",
   })
   sortBy?: string;
 

@@ -61,9 +61,12 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md space-y-6">
-        <div className="text-center">
+    <div
+      suppressHydrationWarning
+      className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-12"
+    >
+      <div suppressHydrationWarning className="w-full max-w-md space-y-6">
+        <div suppressHydrationWarning className="text-center">
           <h1 className="font-jakarta text-2xl font-bold">Tạo tài khoản</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Tham gia cộng đồng săn deal hàng đầu Việt Nam
@@ -74,7 +77,7 @@ export default function RegisterPage() {
           onSubmit={handleSubmit(onSubmit)}
           className="space-y-4 rounded-xl border border-border bg-card p-6 shadow-sm"
         >
-          <div className="space-y-1.5">
+          <div suppressHydrationWarning className="space-y-1.5">
             <Label htmlFor="fullName">Họ và tên</Label>
             <Input
               id="fullName"
@@ -90,7 +93,7 @@ export default function RegisterPage() {
             )}
           </div>
 
-          <div className="space-y-1.5">
+          <div suppressHydrationWarning className="space-y-1.5">
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
@@ -104,9 +107,9 @@ export default function RegisterPage() {
             )}
           </div>
 
-          <div className="space-y-1.5">
+          <div suppressHydrationWarning className="space-y-1.5">
             <Label htmlFor="password">Mật khẩu</Label>
-            <div className="relative">
+            <div suppressHydrationWarning className="relative">
               <Input
                 id="password"
                 type={showPassword ? "text" : "password"}
@@ -134,7 +137,7 @@ export default function RegisterPage() {
             )}
           </div>
 
-          <div className="space-y-1.5">
+          <div suppressHydrationWarning className="space-y-1.5">
             <Label htmlFor="confirmPassword">Xác nhận mật khẩu</Label>
             <Input
               id="confirmPassword"

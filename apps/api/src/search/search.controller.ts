@@ -1,14 +1,16 @@
 import { Controller, Get, Query } from "@nestjs/common";
-import { SearchService, type SearchDealsOptions } from "./search.service";
-import { ApiTags, ApiBearerAuth, ApiResponse } from "@nestjs/swagger";
+import { ApiResponse, ApiTags } from "@nestjs/swagger";
+
+import { Public } from "../auth/decorators";
+import { type SearchDealsOptions, type SearchService } from "./search.service";
 
 @ApiTags("search")
-@Controller("api/search")
+@Controller("search")
 export class SearchController {
   constructor(private readonly searchService: SearchService) {}
 
+  @Public()
   @Get("deals")
-  @ApiBearerAuth()
   @ApiResponse({ description: "Full-text search for deals" })
   async searchDeals(
     @Query("q") query?: string,
@@ -19,7 +21,7 @@ export class SearchController {
     @Query("sortBy") sortBy?: string,
     @Query("page") page?: string,
     @Query("limit") limit?: string,
-  ) {
+  ): Promise<{ data: unknown }> {
     const options: SearchDealsOptions = {
       query: query ?? "",
       platform,
@@ -31,6 +33,6 @@ export class SearchController {
       limit: limit ? parseInt(limit) : 20,
     };
     const result = await this.searchService.searchDeals(options);
-    return { success: true, data: result };
+    return { data: result };
   }
 }

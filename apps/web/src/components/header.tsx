@@ -72,16 +72,25 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/70 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-      <div className="mx-auto flex h-15 items-center gap-3 px-4 sm:px-6 lg:px-8 max-w-7xl">
+    <header
+      suppressHydrationWarning
+      className="sticky top-0 z-50 w-full border-b border-border/70 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80"
+    >
+      <div
+        suppressHydrationWarning
+        className="mx-auto flex h-15 items-center gap-3 px-4 sm:px-6 lg:px-8 max-w-7xl"
+      >
         {/* Logo — distinctive Saffron mark with editorial typographic logo */}
         <Link href="/" className="flex items-center gap-2.5 shrink-0 group">
-          <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary shadow-sm ring-1 ring-primary/20 transition-transform group-hover:scale-105">
+          <div
+            suppressHydrationWarning
+            className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary shadow-sm ring-1 ring-primary/20 transition-transform group-hover:scale-105"
+          >
             <Tag className="h-4 w-4 text-primary-foreground" />
             {/* Small accent dot — a visual signature */}
             <span className="absolute -right-1 -top-0.5 h-2 w-2 rounded-full bg-amber-400 ring-1 ring-background" />
           </div>
-          <div className="flex items-baseline gap-0.5">
+          <div suppressHydrationWarning className="flex items-baseline gap-0.5">
             <span className="font-vietnam text-lg font-bold tracking-tight text-foreground">
               Deal
             </span>
@@ -92,7 +101,10 @@ export function Header() {
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden items-center gap-0.5 md:flex">
+        <nav
+          suppressHydrationWarning
+          className="hidden items-center gap-0.5 md:flex"
+        >
           {navLinks.map((link) => {
             const active =
               pathname === link.href ||
@@ -115,9 +127,8 @@ export function Header() {
           })}
         </nav>
 
-        {/* Search */}
         <form onSubmit={handleSearch} className="hidden flex-1 md:block">
-          <div className="relative">
+          <div suppressHydrationWarning className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
               type="text"
@@ -130,7 +141,10 @@ export function Header() {
         </form>
 
         {/* Right side */}
-        <div className="flex items-center gap-2 ml-auto">
+        <div
+          suppressHydrationWarning
+          className="flex items-center gap-2 ml-auto"
+        >
           <Button
             variant="ghost"
             size="icon"
@@ -234,9 +248,9 @@ export function Header() {
               </DropdownMenu>
             </div>
           ) : (
-            <div className="hidden sm:flex gap-2">
-              <Skeleton className="h-9 w-20" />
-              <Skeleton className="h-9 w-20" />
+            <div suppressHydrationWarning className="hidden sm:flex gap-2">
+              <Skeleton suppressHydrationWarning className="h-9 w-20" />
+              <Skeleton suppressHydrationWarning className="h-9 w-20" />
             </div>
           )}
 
@@ -258,10 +272,16 @@ export function Header() {
 
       {/* Mobile Nav */}
       {mobileOpen && (
-        <div className="border-t border-border md:hidden">
-          <div className="mx-auto max-w-7xl px-4 py-3 space-y-2">
+        <div
+          suppressHydrationWarning
+          className="border-t border-border md:hidden"
+        >
+          <div
+            suppressHydrationWarning
+            className="mx-auto max-w-7xl px-4 py-3 space-y-2"
+          >
             <form onSubmit={handleSearch} className="mb-2">
-              <div className="relative">
+              <div suppressHydrationWarning className="relative">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
                   type="text"
@@ -282,7 +302,7 @@ export function Header() {
                 {link.label}
               </Link>
             ))}
-            <div className="flex gap-2 pt-2">
+            <div suppressHydrationWarning className="flex gap-2 pt-2">
               {isHydrated && !user ? (
                 <>
                   <Button

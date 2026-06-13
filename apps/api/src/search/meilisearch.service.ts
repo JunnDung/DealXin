@@ -1,5 +1,5 @@
-import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
-import { MeiliSearch, Index } from "meilisearch";
+import { Injectable, Logger, type OnModuleInit } from "@nestjs/common";
+import { type Index, MeiliSearch } from "meilisearch";
 
 export interface DealDocument {
   id: string;
@@ -50,9 +50,24 @@ export class MeilisearchService implements OnModuleInit {
   async configureIndex(): Promise<void> {
     try {
       await this.index.updateSettings({
-        searchableAttributes: ["title", "description", "platform", "categoryName"],
-        filterableAttributes: ["platform", "categoryId", "status", "discountPercent"],
-        sortableAttributes: ["createdAt", "discountPercent", "salePrice", "score"],
+        searchableAttributes: [
+          "title",
+          "description",
+          "platform",
+          "categoryName",
+        ],
+        filterableAttributes: [
+          "platform",
+          "categoryId",
+          "status",
+          "discountPercent",
+        ],
+        sortableAttributes: [
+          "createdAt",
+          "discountPercent",
+          "salePrice",
+          "score",
+        ],
         rankingRules: [
           "words",
           "typo",
@@ -122,7 +137,8 @@ export class MeilisearchService implements OnModuleInit {
       return {
         hits: result.hits as DealDocument[],
         estimatedTotalHits: result.estimatedTotalHits ?? 0,
-        totalHits: (result as Record<string, unknown>).totalHits as number ?? 0,
+        totalHits:
+          ((result as Record<string, unknown>).totalHits as number) ?? 0,
         processingTimeMs: result.processingTimeMs,
       };
     } catch (error) {

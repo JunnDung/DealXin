@@ -1,7 +1,8 @@
-import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
-import { MessagingService } from "../messaging.service";
+import { Injectable, Logger, type OnModuleInit } from "@nestjs/common";
+
+import { type PrismaService } from "../../prisma/prisma.service";
+import { type MessagingService } from "../messaging.service";
 import { Queues } from "../routing-keys";
-import { PrismaService } from "../../prisma/prisma.service";
 
 @Injectable()
 export class NotificationConsumer implements OnModuleInit {
@@ -15,16 +16,16 @@ export class NotificationConsumer implements OnModuleInit {
   async onModuleInit() {
     await this.messagingService.subscribe(
       Queues.NOTIFICATION,
-      async (msg: unknown) => {
-        await this.handleNotification(msg);
+      async (message: unknown) => {
+        await this.handleNotification(message);
       },
     );
-    
+
     this.logger.log("Notification consumer started");
   }
 
-  private async handleNotification(msg: unknown) {
-    const event = msg as Record<string, unknown>;
+  private async handleNotification(message: unknown) {
+    const event = message as Record<string, unknown>;
     const eventType = String(event["eventType"] ?? "");
     const payload = event["payload"] as Record<string, unknown> | undefined;
 
@@ -80,7 +81,12 @@ export class NotificationConsumer implements OnModuleInit {
     await this.prisma.notification.create({
       data: {
         userId,
-        type: type as "DEAL_APPROVED" | "DEAL_REJECTED" | "DEAL_EXPIRING" | "PRICE_DROPPED" | "VOUCHER_EXPIRING",
+        type: type as
+          | "DEAL_APPROVED"
+          | "DEAL_REJECTED"
+          | "DEAL_EXPIRING"
+          | "PRICE_DROPPED"
+          | "VOUCHER_EXPIRING",
         title,
         body,
         dealId: dealId ?? null,

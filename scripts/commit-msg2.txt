@@ -1,0 +1,16 @@
+feat(api): standardize response wrapping and align frontend-backend contracts
+
+Backend changes:
+- Wrap all controller responses in { data: ... } format
+- Align UserResponseDto.fullName with frontend expectations
+- Fix controller routes to avoid double /api/ prefix
+- Update ValidationPipe config: whitelist=true, transform=false
+- Add onModuleDestroy to MessagingService for proper cleanup
+
+Frontend changes:
+- Update api.ts to expect { data: ... } wrapper on all responses
+- Fix use-auth hook to handle new response format correctly
+- Fix deal-card Select hydration mismatch
+- Fix demo credentials password
+
+Co-Authored-By: Claude <noreply@anthropic.com>

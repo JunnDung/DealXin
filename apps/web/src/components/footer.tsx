@@ -3,18 +3,33 @@ import Link from "next/link";
 
 export function Footer() {
   return (
-    <footer className="border-t border-border bg-background">
-      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+    <footer
+      suppressHydrationWarning
+      className="border-t border-border bg-background"
+    >
+      <div
+        suppressHydrationWarning
+        className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8"
+      >
         {/* Top row: brand statement + platform quick links */}
-        <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
+        <div
+          suppressHydrationWarning
+          className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between"
+        >
           {/* Brand */}
-          <div className="max-w-xs">
+          <div suppressHydrationWarning className="max-w-xs">
             <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary shadow-sm ring-1 ring-primary/20">
+              <div
+                suppressHydrationWarning
+                className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary shadow-sm ring-1 ring-primary/20"
+              >
                 <Tag className="h-4 w-4 text-primary-foreground" />
                 <span className="absolute -right-1 -top-0.5 h-2 w-2 rounded-full bg-amber-400 ring-1 ring-background" />
               </div>
-              <div className="flex items-baseline gap-0.5">
+              <div
+                suppressHydrationWarning
+                className="flex items-baseline gap-0.5"
+              >
                 <span className="font-vietnam text-base font-bold tracking-tight text-foreground">
                   Deal
                 </span>
@@ -30,11 +45,14 @@ export function Footer() {
           </div>
 
           {/* Platform quick links — horizontal, not a column */}
-          <div>
+          <div suppressHydrationWarning>
             <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Nền tảng
             </p>
-            <div className="flex flex-wrap gap-x-6 gap-y-2">
+            <div
+              suppressHydrationWarning
+              className="flex flex-wrap gap-x-6 gap-y-2"
+            >
               {[
                 { href: "/deals?platform=SHOPEE", label: "Shopee" },
                 { href: "/deals?platform=LAZADA", label: "Lazada" },
@@ -55,12 +73,15 @@ export function Footer() {
         </div>
 
         {/* Bottom: legal line */}
-        <div className="mt-8 flex flex-col items-start gap-3 border-t border-border/50 pt-6 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xs text-muted-foreground">
+        <div
+          suppressHydrationWarning
+          className="mt-8 flex flex-col items-start gap-3 border-t border-border/50 pt-6 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <p suppressHydrationWarning className="text-xs text-muted-foreground">
             &copy; {new Date().getFullYear()} DealXin. Tất cả quyền được bảo
             lưu.
           </p>
-          <div className="flex items-center gap-5">
+          <div suppressHydrationWarning className="flex items-center gap-5">
             <Link
               href="/privacy"
               className="text-xs text-muted-foreground hover:text-foreground transition-colors"

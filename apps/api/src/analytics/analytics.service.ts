@@ -1,7 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { AnalyticsEventType } from "@prisma/client";
 
-import { PrismaService } from "../prisma/prisma.service";
+import { type PrismaService } from "../prisma/prisma.service";
 
 interface TrackEventData {
   type: AnalyticsEventType;
@@ -19,7 +19,9 @@ export class AnalyticsService {
   async trackEvent(data: TrackEventData): Promise<void> {
     try {
       const { type, userId, dealId, metadata } = data;
-      const createData: Parameters<typeof this.prisma.analyticsEvent.create>[0]["data"] = {
+      const createData: Parameters<
+        typeof this.prisma.analyticsEvent.create
+      >[0]["data"] = {
         type,
         userId: userId ?? null,
         dealId: dealId ?? null,
@@ -31,7 +33,7 @@ export class AnalyticsService {
       await this.prisma.analyticsEvent.create({ data: createData });
     } catch (error) {
       this.logger.error(
-        `Failed to track event: ${error instanceof Error ? error.message : String(error)}`
+        `Failed to track event: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
   }
@@ -86,7 +88,12 @@ export class AnalyticsService {
       }),
     ]);
 
-    return { pageViews, upvotes, bookmarks, total: pageViews + upvotes + bookmarks };
+    return {
+      pageViews,
+      upvotes,
+      bookmarks,
+      total: pageViews + upvotes + bookmarks,
+    };
   }
 
   async getDealsSubmittedByDay(days: number = 30) {
@@ -104,9 +111,10 @@ export class AnalyticsService {
 
     const byDay = new Map<string, number>();
     for (const event of events) {
-      const dateStr = event.createdAt instanceof Date
-        ? (event.createdAt.toISOString().split("T")[0] ?? "")
-        : (String(event.createdAt).split("T")[0] ?? "");
+      const dateStr =
+        event.createdAt instanceof Date
+          ? (event.createdAt.toISOString().split("T")[0] ?? "")
+          : (String(event.createdAt).split("T")[0] ?? "");
       const currentCount = byDay.get(dateStr) ?? 0;
       byDay.set(dateStr, currentCount + event._count.dealId);
     }

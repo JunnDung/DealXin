@@ -3,8 +3,9 @@ import {
   type OnModuleDestroy,
   type OnModuleInit,
 } from "@nestjs/common";
-import { type PrismaService } from "../prisma/prisma.service";
+
 import { type MessagingService } from "../messaging/messaging.service";
+import { type PrismaService } from "../prisma/prisma.service";
 import { logger } from "./logger/pino.logger";
 
 @Injectable()
@@ -81,12 +82,17 @@ export class OutboxPublisherService implements OnModuleInit, OnModuleDestroy {
 
       return published;
     } catch (err) {
-      logger.error(`Outbox publish error: ${err instanceof Error ? err.message : String(err)}`);
+      logger.error(
+        `Outbox publish error: ${err instanceof Error ? err.message : String(err)}`,
+      );
       return 0;
     }
   }
 
-  private buildRoutingKey(event: { aggregateType: string; eventType: string }): string {
+  private buildRoutingKey(event: {
+    aggregateType: string;
+    eventType: string;
+  }): string {
     return `${event.aggregateType.toLowerCase()}.${event.eventType.toLowerCase()}`;
   }
 }

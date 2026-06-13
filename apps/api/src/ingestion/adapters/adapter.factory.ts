@@ -1,13 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
+
+import { type CsvImportAdapter } from "./csv-import.adapter";
+import { type JsonImportAdapter } from "./json-import.adapter";
+import { type MockLazadaAdapter } from "./mock-lazada.adapter";
+import { type MockShopeeAdapter } from "./mock-shopee.adapter";
+import { type MockTiktokShopAdapter } from "./mock-tiktok-shop.adapter";
 import {
-  SourceType,
-  SourceAdapter,
-} from './source-adapter.interface';
-import { MockShopeeAdapter } from './mock-shopee.adapter';
-import { MockLazadaAdapter } from './mock-lazada.adapter';
-import { MockTiktokShopAdapter } from './mock-tiktok-shop.adapter';
-import { CsvImportAdapter } from './csv-import.adapter';
-import { JsonImportAdapter } from './json-import.adapter';
+  type SourceAdapter,
+  type SourceType,
+} from "./source-adapter.interface";
 
 @Injectable()
 export class AdapterFactory {
@@ -32,7 +33,7 @@ export class AdapterFactory {
   getAdapter(sourceType: SourceType): SourceAdapter {
     const adapter = this.adapterMap.get(sourceType);
     if (!adapter) {
-      const available = Array.from(this.adapterMap.keys()).join(', ');
+      const available = Array.from(this.adapterMap.keys()).join(", ");
       throw new Error(
         `No adapter found for '${sourceType}'. Available: ${available}`,
       );

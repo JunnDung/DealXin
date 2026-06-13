@@ -42,8 +42,8 @@ import {
 @UsePipes(
   new ValidationPipe({
     whitelist: true,
-    forbidNonWhitelisted: true,
-    transform: true,
+    forbidNonWhitelisted: false,
+    transform: false,
   }),
 )
 export class DealsController {
@@ -58,8 +58,8 @@ export class DealsController {
   async listDeals(
     @Query() filters: DealFilterQueryDto,
     @CurrentUser() user?: AuthenticatedUser,
-  ): Promise<PaginatedDealsResponseDto> {
-    return this.deals.findDeals(filters, user?.id);
+  ): Promise<{ data: PaginatedDealsResponseDto }> {
+    return { data: await this.deals.findDeals(filters, user?.id) };
   }
 
   @Public()
@@ -69,8 +69,8 @@ export class DealsController {
   async getDealBySlug(
     @Param("slug") slug: string,
     @CurrentUser() user?: AuthenticatedUser,
-  ): Promise<DealResponseDto> {
-    return this.deals.findDealBySlug(slug, user?.id);
+  ): Promise<{ data: DealResponseDto }> {
+    return { data: await this.deals.findDealBySlug(slug, user?.id) };
   }
 
   @Public()
@@ -80,16 +80,16 @@ export class DealsController {
   async getDealById(
     @Param("id") id: string,
     @CurrentUser() user?: AuthenticatedUser,
-  ): Promise<DealResponseDto> {
-    return this.deals.findDealById(id, user?.id);
+  ): Promise<{ data: DealResponseDto }> {
+    return { data: await this.deals.findDealById(id, user?.id) };
   }
 
   @Public()
   @Get("deals/:id/price-history")
   @ApiOperation({ summary: "Get price history for a deal" })
   @ApiResponse({ status: 200, isArray: true })
-  async getPriceHistory(@Param("id") id: string) {
-    return this.deals.getPriceHistory(id);
+  async getPriceHistory(@Param("id") id: string): Promise<{ data: unknown }> {
+    return { data: await this.deals.getPriceHistory(id) };
   }
 
   // ===== USER =====
@@ -103,8 +103,8 @@ export class DealsController {
   async createDeal(
     @Body() dto: CreateDealDto,
     @CurrentUser() user: AuthenticatedUser,
-  ): Promise<DealResponseDto> {
-    return this.deals.createDeal(dto, user.id);
+  ): Promise<{ data: DealResponseDto }> {
+    return { data: await this.deals.createDeal(dto, user.id) };
   }
 
   @UseGuards(JwtAuthGuard)
@@ -119,8 +119,8 @@ export class DealsController {
     @Param("id") id: string,
     @Body() dto: UpdateDealDto,
     @CurrentUser() user: AuthenticatedUser,
-  ): Promise<DealResponseDto> {
-    return this.deals.updateDeal(id, dto, user.id, user.role);
+  ): Promise<{ data: DealResponseDto }> {
+    return { data: await this.deals.updateDeal(id, dto, user.id, user.role) };
   }
 
   @UseGuards(JwtAuthGuard)
@@ -133,8 +133,8 @@ export class DealsController {
     @Param("id") id: string,
     @Body() dto: VoteDealDto,
     @CurrentUser() user: AuthenticatedUser,
-  ) {
-    return this.deals.voteDeal(id, user.id, dto.value);
+  ): Promise<{ data: unknown }> {
+    return { data: await this.deals.voteDeal(id, user.id, dto.value) };
   }
 
   @UseGuards(JwtAuthGuard)
@@ -146,8 +146,8 @@ export class DealsController {
   async toggleBookmark(
     @Param("id") id: string,
     @CurrentUser() user: AuthenticatedUser,
-  ) {
-    return this.deals.bookmarkDeal(id, user.id);
+  ): Promise<{ data: unknown }> {
+    return { data: await this.deals.bookmarkDeal(id, user.id) };
   }
 
   // ===== ADMIN =====
@@ -158,8 +158,10 @@ export class DealsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: "List all pending deals for moderation" })
   @ApiResponse({ status: 200, type: PaginatedDealsResponseDto })
-  async listPendingDeals(@Query() filters: DealFilterQueryDto) {
-    return this.deals.getPendingDeals(filters);
+  async listPendingDeals(
+    @Query() filters: DealFilterQueryDto,
+  ): Promise<{ data: PaginatedDealsResponseDto }> {
+    return { data: await this.deals.getPendingDeals(filters) };
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -173,8 +175,8 @@ export class DealsController {
   async approveDeal(
     @Param("id") id: string,
     @CurrentUser() user: AuthenticatedUser,
-  ): Promise<DealResponseDto> {
-    return this.deals.approveDeal(id, user.id);
+  ): Promise<{ data: DealResponseDto }> {
+    return { data: await this.deals.approveDeal(id, user.id) };
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -189,8 +191,8 @@ export class DealsController {
     @Param("id") id: string,
     @CurrentUser() user: AuthenticatedUser,
     @Body() body: { reason?: string },
-  ): Promise<DealResponseDto> {
-    return this.deals.rejectDeal(id, user.id, body.reason);
+  ): Promise<{ data: DealResponseDto }> {
+    return { data: await this.deals.rejectDeal(id, user.id, body.reason) };
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -203,7 +205,7 @@ export class DealsController {
   async expireDeal(
     @Param("id") id: string,
     @CurrentUser() user: AuthenticatedUser,
-  ): Promise<DealResponseDto> {
-    return this.deals.expireDeal(id, user.id);
+  ): Promise<{ data: DealResponseDto }> {
+    return { data: await this.deals.expireDeal(id, user.id) };
   }
 }

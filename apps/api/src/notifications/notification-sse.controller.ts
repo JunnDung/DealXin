@@ -1,9 +1,9 @@
 import { Controller, Sse, UseGuards } from "@nestjs/common";
-import { Observable, interval, startWith, switchMap } from "rxjs";
+import { interval, type Observable, startWith, switchMap } from "rxjs";
 
 import { type AuthenticatedUser, CurrentUser } from "../auth/decorators";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
-import { NotificationService } from "./notification.service";
+import { type NotificationService } from "./notification.service";
 
 interface SseMessage {
   type: string;
@@ -11,7 +11,7 @@ interface SseMessage {
   timestamp: string;
 }
 
-@Controller("api/notifications")
+@Controller("notifications")
 @UseGuards(JwtAuthGuard)
 export class NotificationSseController {
   constructor(private readonly notificationService: NotificationService) {}
