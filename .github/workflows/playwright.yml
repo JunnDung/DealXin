@@ -103,12 +103,6 @@ jobs:
           RABBITMQ_URL: amqp://dealxin:dealxin_secret@localhost:5672
           MEILISEARCH_HOST: http://localhost:7700
           NODE_ENV: development
-        env:
-          DATABASE_URL: postgresql://dealxin:dealxin_secret@localhost:5432/dealxin
-          REDIS_URL: redis://localhost:6379
-          RABBITMQ_URL: amqp://dealxin:dealxin_secret@localhost:5672
-          MEILISEARCH_HOST: http://localhost:7700
-          NODE_ENV: development
 
       - name: Wait for API health
         run: |
