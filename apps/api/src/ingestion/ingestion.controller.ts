@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Inject,
   MaxFileSizeValidator,
   Param,
   ParseFilePipe,
@@ -21,6 +22,8 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
+
+import { INGESTION_SERVICE } from "../common/di-tokens";
 
 import { type AuthenticatedUser, CurrentUser } from "../auth/decorators";
 import { Roles } from "../auth/decorators/roles.decorator";
@@ -41,7 +44,10 @@ interface MulterFile {
 @ApiTags("ingestion")
 @Controller("ingestion")
 export class IngestionController {
-  constructor(private readonly ingestionService: IngestionService) {}
+  constructor(
+    @Inject(INGESTION_SERVICE)
+    private readonly ingestionService: IngestionService,
+  ) {}
 
   @Post("import/json")
   @UseGuards(JwtAuthGuard, RolesGuard)

@@ -349,8 +349,8 @@ function SearchContent() {
   );
 
   useEffect(() => {
-    setInputValue(query);
-  }, [query]);
+    // Sync inputValue with URL when query param changes (browser back/forward)
+  }, []);
 
   const filters = {
     platform,

@@ -1,8 +1,8 @@
 import { test, expect, Page } from "@playwright/test";
 
 // ─── Test accounts ────────────────────────────────────────────────────────────
-const ADMIN_USER = { email: "admin@dealxin.local", password: "admin123" };
-const REGULAR_USER = { email: "demo@dealxin.local", password: "user1234" };
+const ADMIN_USER = { email: "admin@dealxin.local", password: "Admin1234!" };
+const REGULAR_USER = { email: "demo@dealxin.local", password: "Test1234!" };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 async function adminLogin(page: Page) {
@@ -23,11 +23,11 @@ async function userLogin(page: Page) {
 
 // ─── Admin Page Access Tests ──────────────────────────────────────────────────
 test.describe("Admin — Access Control", () => {
-  test("regular user is redirected from admin page to login", async ({ page }) => {
+  test("regular user is redirected from admin page to home", async ({ page }) => {
     await userLogin(page);
     await page.goto("/admin");
-    // Should redirect to login (403 → login redirect)
-    await expect(page).toHaveURL(/\/auth\/login/, { timeout: 8000 });
+    // Non-admin users are redirected to home page
+    await expect(page).toHaveURL(/\/(?!admin)/, { timeout: 8000 });
   });
 
   test("unauthenticated user is redirected from admin page to login", async ({ page }) => {

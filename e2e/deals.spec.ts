@@ -1,8 +1,8 @@
 import { test, expect, Page } from "@playwright/test";
 
 // ─── Seed data ────────────────────────────────────────────────────────────────
-const ADMIN_USER = { email: "admin@dealxin.local", password: "admin123" };
-const REGULAR_USER = { email: "demo@dealxin.local", password: "user1234" };
+const ADMIN_USER = { email: "admin@dealxin.local", password: "Admin1234!" };
+const REGULAR_USER = { email: "demo@dealxin.local", password: "Test1234!" };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 async function login(page: Page, email: string, password: string) {

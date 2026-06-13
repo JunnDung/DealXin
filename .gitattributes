@@ -1,0 +1,36 @@
+# Auto-detect text files and normalize to LF
+* text=auto
+
+# Enforce LF for all source files
+*.ts    text eol=lf
+*.tsx   text eol=lf
+*.js    text eol=lf
+*.mjs   text eol=lf
+*.cjs   text eol=lf
+*.json  text eol=lf
+*.md    text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.css   text eol=lf
+*.html  text eol=lf
+*.sh    text eol=lf
+*.sql   text eol=lf
+*.prisma text eol=lf
+
+# Treat as binary (no conversion)
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.pdf   binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.eot   binary
+*.svg   binary
+*.mp4   binary
+*.webm  binary
+*.zip   binary
+*.tar   binary
+*.gz    binary

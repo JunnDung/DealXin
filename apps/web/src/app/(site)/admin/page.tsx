@@ -98,8 +98,12 @@ export default function AdminPage() {
   const [page, setPage] = useState(1);
 
   useEffect(() => {
-    if (isHydrated && (!user || user.role !== "ADMIN")) {
-      router.push("/");
+    if (isHydrated) {
+      if (!user) {
+        router.push("/auth/login");
+      } else if (user.role !== "ADMIN") {
+        router.push("/");
+      }
     }
   }, [isHydrated, user, router]);
 
@@ -223,6 +227,7 @@ export default function AdminPage() {
     }),
   ];
 
+  // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table returns unstable functions incompatible with React Compiler
   const table = useReactTable({
     data: data?.data ?? [],
     columns,

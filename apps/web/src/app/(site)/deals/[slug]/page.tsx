@@ -15,6 +15,7 @@ import {
   ThumbsUp,
   TrendingUp,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { use } from "react";
@@ -172,12 +173,15 @@ export default function DealDetailPage({ params }: DealDetailPageProps) {
         <div className="lg:col-span-2 space-y-5">
           {/* Image */}
           {deal.imageUrl && (
-            <div className="overflow-hidden rounded-xl border border-border">
-              <img
+            <div
+              className="relative overflow-hidden rounded-xl border border-border"
+              style={{ maxHeight: "400px" }}
+            >
+              <Image
                 src={deal.imageUrl}
                 alt={deal.title}
-                className="w-full object-cover"
-                style={{ maxHeight: "400px" }}
+                fill
+                className="object-cover"
               />
             </div>
           )}

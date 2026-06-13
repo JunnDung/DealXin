@@ -1,27 +1,15 @@
 # DealXin — Real-time Deal Aggregator Platform
 
 [![CI](https://github.com/JunnDung/DealXin/actions/workflows/ci.yml/badge.svg)](https://github.com/JunnDung/DealXin/actions/workflows/ci.yml)
+[![Playwright E2E](https://github.com/JunnDung/DealXin/actions/workflows/playwright.yml/badge.svg)](https://github.com/JunnDung/DealXin/actions/workflows/playwright.yml)
 
 > Một nền tảng full-stack để tổng hợp deal, voucher, flash sale và ưu đãi thương mại điện tử Việt Nam.
 
-## Project Status
+## Live Demo
 
-| Phase    | Mô tả                        | Trạng thái |
-| -------- | ---------------------------- | ---------- |
-| Phase 0  | Audit & Planning             | ✓ Done     |
-| Phase 1  | Monorepo Scaffold            | ✓ Done     |
-| Phase 2  | Database & Auth              | ✓ Done     |
-| Phase 3  | Deals Core                   | ✓ Done     |
-| Phase 4  | UI Polish & UX               | ✓ Done     |
-| Phase 5  | Ingestion & Adapters         | ✓ Done     |
-| Phase 6  | Event-Driven & Microservices | ✓ Done     |
-| Phase 7  | Search (Meilisearch)         | ✓ Done     |
-| Phase 8  | Notifications                | ✓ Done     |
-| Phase 9  | Analytics                    | ✓ Done     |
-| Phase 10 | Observability & CI           | ✓ Done     |
-| Phase 11 | Deployment                   | ✓ Done     |
-
-Đang xây dựng theo từng phase. Xem [docs/roadmap.md](docs/roadmap.md) để biết tiến độ.
+- **Frontend**: https://dealxin.vercel.app
+- **Backend API**: https://dealxin-api.up.railway.app/api
+- **Swagger Docs**: https://dealxin-api.up.railway.app/api/docs
 
 ## Quick Start
 
@@ -36,50 +24,57 @@ pnpm install
 # Start infrastructure
 docker compose up -d
 
-# Copy env file
+# Copy env file and fill in secrets
 cp .env.example .env
-# Edit .env and fill in secrets
 
-# Start development
+# Run database migrations and seed
+pnpm --filter api db:migrate:dev
+pnpm --filter api db:seed
+
+# Start development (API on :3001, Web on :3000)
 pnpm dev
 ```
 
-Frontend: http://localhost:3000
-API: http://localhost:3001
-Swagger: http://localhost:3001/api
+| Service   | URL                          |
+| --------- | ---------------------------- |
+| Frontend  | http://localhost:3000        |
+| API       | http://localhost:3001         |
+| Swagger   | http://localhost:3001/api/docs |
+| RabbitMQ  | http://localhost:15672        |
+| Meilisearch| http://localhost:7700       |
 
 ## Tech Stack
 
-| Layer          | Technology                              |
-| -------------- | --------------------------------------- |
-| Frontend       | Next.js 15, React 18, TypeScript strict |
-| Styling        | Tailwind CSS, shadcn/ui                 |
-| State          | TanStack Query, Zustand                 |
-| Backend        | NestJS 10, TypeScript strict            |
-| ORM            | Prisma 6, PostgreSQL 17                 |
-| Cache          | Redis 7                                 |
-| Message Broker | RabbitMQ 3                              |
-| Search         | Meilisearch                             |
-| Container      | Docker Compose                          |
-| CI/CD          | GitHub Actions                          |
-| Deploy         | Vercel (frontend), Railway (backend)    |
+| Layer           | Technology                                |
+| --------------- | ----------------------------------------- |
+| Frontend        | Next.js 15, React 18, TypeScript strict  |
+| Styling         | Tailwind CSS, shadcn/ui                   |
+| State/Fetch    | TanStack Query, Zustand                   |
+| Backend         | NestJS 10, TypeScript strict             |
+| ORM             | Prisma 6, PostgreSQL 17                  |
+| Cache           | Redis 7                                  |
+| Message Broker  | RabbitMQ 3                               |
+| Search          | Meilisearch                              |
+| Container       | Docker Compose                           |
+| CI/CD           | GitHub Actions (lint, typecheck, test, build, E2E) |
+| Deploy          | Vercel (frontend), Railway (backend)    |
 
 ## Architecture
 
 ```mermaid
 flowchart TB
-    subgraph Frontend["🌐 Frontend (Next.js)"]
+    subgraph Frontend["Frontend (Next.js)"]
         WEB[Next.js 15<br/>TanStack Query<br/>Zustand]
     end
 
-    subgraph Backend["⚙️ Backend (NestJS)"]
+    subgraph Backend["Backend (NestJS)"]
         API[NestJS API<br/>JWT Auth<br/>RBAC]
         INGEST[Ingestion Module<br/>Adapter Factory]
 
         API --> INGEST
     end
 
-    subgraph Database["💾 Data Layer"]
+    subgraph DataLayer["Data Layer"]
         PG[(PostgreSQL<br/>Prisma ORM)]
         REDIS[Redis<br/>Cache/PubSub]
         OUTBOX[(OutboxEvent)]
@@ -87,49 +82,38 @@ flowchart TB
         NOTIFS[(Notification)]
     end
 
-    subgraph MessageBroker["🔔 Message Broker (RabbitMQ)"]
+    subgraph Broker["Message Broker (RabbitMQ)"]
         RMQ[RabbitMQ]
     end
 
-    subgraph Consumers["📥 Consumers"]
+    subgraph Consumers["Consumers"]
         SEARCH_CON[Search Consumer]
         NOTIF_CON[Notification Consumer]
         ANALYTICS_CON[Analytics Consumer]
     end
 
-    subgraph Search["🔍 Search (Meilisearch)"]
+    subgraph SearchEngine["Search (Meilisearch)"]
         MEILI[Meilisearch<br/>deals index]
     end
 
-    subgraph Platforms["🛒 E-Commerce Platforms"]
-        SHOPEE[Shopee]
-        LAZADA[Lazada]
-        TIKTOK[TikTok Shop]
-        ADMIN[Admin Import<br/>CSV/JSON]
+    subgraph Platforms["Data Sources"]
+        SHOPEE[Shopee Mock]
+        LAZADA[Lazada Mock]
+        TIKTOK[TikTok Shop Mock]
+        ADMIN[Admin CSV/JSON Import]
     end
 
-    %% Frontend → Backend
     WEB <-->|"REST / SSE"| API
-
-    %% Backend → Database
     API --> PG
     API --> REDIS
     API --> OUTBOX
-
-    %% Outbox → RabbitMQ
     OUTBOX -->|"poll & publish"| RMQ
-
-    %% RabbitMQ → Consumers
     RMQ --> SEARCH_CON
     RMQ --> NOTIF_CON
     RMQ --> ANALYTICS_CON
-
-    %% Consumers → External
     SEARCH_CON --> MEILI
     NOTIF_CON --> NOTIFS
     ANALYTICS_CON --> ANALYTICS
-
-    %% Platforms → Ingestion
     SHOPEE --> INGEST
     LAZADA --> INGEST
     TIKTOK --> INGEST
@@ -137,108 +121,127 @@ flowchart TB
     INGEST --> PG
 ```
 
-### Key Patterns Implemented
+### Design Patterns Implemented
 
-| Pattern            | Where                          | Purpose                       |
-| ------------------ | ------------------------------ | ----------------------------- |
-| Outbox Pattern     | `OutboxEvent` table            | Reliable event publishing     |
-| Adapter Pattern    | `IngestionModule`              | Multi-platform data ingestion |
-| CQRS-lite          | Event consumers                | Async read-model updates      |
-| Repository Pattern | `PrismaDealRepository`         | Data access abstraction       |
-| Strategy Pattern   | `DealStatusTransitionStrategy` | State machine validation      |
+| Pattern             | Where                              | Purpose                      |
+| ------------------ | ---------------------------------- | ---------------------------- |
+| Outbox Pattern      | `OutboxEvent` table               | Reliable event publishing     |
+| Adapter Pattern     | `IngestionModule`                  | Multi-platform data ingestion |
+| CQRS-lite           | Event consumers                    | Async read-model updates     |
+| Repository Pattern  | `PrismaDealRepository`             | Data access abstraction       |
+| Strategy Pattern     | `DealStatusTransitionStrategy`      | State machine validation     |
 
-## Live Demo
+## Project Phases
 
-> 🚀 **Coming Soon**: The frontend will be deployed to Vercel and the backend to Railway.
+All 12 phases completed:
 
-- **Frontend**: https://dealxin.vercel.app
-- **Backend API**: https://dealxin-api.up.railway.app/api
+| Phase | Description                       | Status |
+| ----- | --------------------------------- | ------ |
+| 0     | Audit & Planning                  | ✓ Done |
+| 1     | Monorepo Scaffold                 | ✓ Done |
+| 2     | Database & Auth                  | ✓ Done |
+| 3     | Deals Core                       | ✓ Done |
+| 4     | UI Polish & UX                   | ✓ Done |
+| 5     | Ingestion & Adapters             | ✓ Done |
+| 6     | Event-Driven & Microservices     | ✓ Done |
+| 7     | Search (Meilisearch)             | ✓ Done |
+| 8     | Notifications                    | ✓ Done |
+| 9     | Analytics                        | ✓ Done |
+| 10    | Observability & CI               | ✓ Done |
+| 11    | Deployment                       | ✓ Done |
+| 12    | Recruiter Polish                 | ✓ Done |
 
-_To run locally, see [Deployment Guide](./docs/deployment.md)_
+## Features
 
-## Phases
+### User Features
+- Browse and search deals from Shopee, Lazada, TikTok Shop
+- Filter by platform, category, discount range
+- Sort by newest, hot score, discount percentage
+- Bookmark deals, vote (upvote/downvote)
+- Real-time notification on deal approval
+- Responsive mobile layout
 
-| Phase | Mô tả                        | Trạng thái |
-| ----- | ---------------------------- | ---------- |
-| 0     | Audit & Planning             | ✓ Done     |
-| 1     | Monorepo Scaffold            | ✓ Done     |
-| 2     | Database & Auth              | ✓ Done     |
-| 3     | Deals Core                   | ✓ Done     |
-| 4     | UI Polish & UX               | ✓ Done     |
-| 5     | Ingestion & Adapters         | ✓ Done     |
-| 6     | Event-Driven & Microservices | ✓ Done     |
-| 7     | Search (Meilisearch)         | ✓ Done     |
-| 8     | Notifications                | ✓ Done     |
-| 9     | Analytics                    | ✓ Done     |
-| 10    | Observability & CI           | ✓ Done     |
-| 11    | Deployment                   | ✓ Done     |
-| 12    | Recruiter Polish             | Pending    |
+### Admin Features
+- Moderation dashboard (approve/reject/expire pending deals)
+- Analytics: views, upvotes, bookmarks, daily submissions
+- Deal source management
+- Import via CSV/JSON or mock platform crawlers
+- Audit logs for all admin actions
 
-## Docs
+### Architecture Highlights
+- **Event-driven**: Outbox pattern guarantees at-least-once delivery via RabbitMQ
+- **CQRS-lite**: Write via REST, async read-model updates via consumers
+- **Search**: Meilisearch auto-indexes approved deals within 2s
+- **Type-safe monorepo**: Shared contracts between API and Web
 
-- [Roadmap](docs/roadmap.md)
-- [Architecture Overview](docs/architecture.md) — System architecture, data flows, module map
-- [Design Patterns](docs/design-patterns.md) — Repository, Strategy, Adapter, Outbox, CQRS patterns with code references
-- [Event Contracts](docs/event-contracts.md) — Domain event shapes, queue architecture, consumer idempotency
-- [Database ERD](docs/database-erd.md)
-- [API Docs](docs/api-docs.md)
-- [Testing Guide](docs/testing.md)
-- [Deployment Guide](docs/deployment.md)
-- [CV Bullets](docs/cv-bullets.md)
-- [Interview Q&A](docs/interview-qa.md)
+## Test Accounts
+
+| Role  | Email                    | Password   |
+| ----- | ------------------------ | ---------- |
+| Admin | admin@dealxin.local      | Admin1234! |
+| User  | demo@dealxin.local       | Test1234!  |
+
+## Documentation
+
+| Document                              | Description                                      |
+| ------------------------------------- | ------------------------------------------------ |
+| [Roadmap](docs/roadmap.md)            | Phase-by-phase progress tracker                  |
+| [Architecture](docs/architecture.md)   | System architecture, data flows, module map      |
+| [Design Patterns](docs/design-patterns.md) | Repository, Strategy, Adapter, Outbox, CQRS patterns |
+| [Event Contracts](docs/event-contracts.md) | Domain event shapes, queue architecture      |
+| [Database ERD](docs/database-erd.md)   | Full schema visualization                        |
+| [API Docs](docs/api-docs.md)          | Endpoint reference                              |
+| [Testing Guide](docs/testing.md)       | Unit, integration, and E2E testing              |
+| [Deployment Guide](docs/deployment.md) | Vercel, Railway, Docker                        |
+| [CV Bullets](docs/cv-bullets.md)      | Technical accomplishments for resume              |
+| [Interview Q&A](docs/interview-qa.md) | Common interview questions and answers           |
+| [Docs Index](docs/index.md)            | All documentation links                         |
 
 ## Environment Variables
 
-Xem [.env.example](.env.example).
+See [.env.example](.env.example).
+
+Key groups:
+- **Database**: `DATABASE_URL`
+- **Auth**: `JWT_SECRET`, `JWT_REFRESH_SECRET`, `JWT_ACCESS_EXPIRY`, `JWT_REFRESH_EXPIRY`
+- **Infrastructure**: `REDIS_URL`, `RABBITMQ_URL`
+- **Search**: `MEILISEARCH_HOST`, `MEILISEARCH_API_KEY`
+- **CORS**: `CORS_ORIGIN`
+
+## Scripts
+
+```bash
+pnpm dev           # Start all services (API + Web)
+pnpm build         # Build all packages
+pnpm lint          # Lint all packages
+pnpm typecheck     # TypeScript check all packages
+pnpm test          # Unit tests (API + Web)
+pnpm test:e2e     # Playwright E2E tests
+pnpm db:migrate:dev  # Run migrations (dev)
+pnpm db:seed       # Seed database
+pnpm docker:up    # Start Docker services
+pnpm docker:down  # Stop Docker services
+```
 
 ## Deployment
 
 ### Frontend (Vercel)
 
 ```bash
-cd apps/web
-vercel --prod
+cd apps/web && vercel --prod
 ```
 
-Required environment variables:
-
-- `NEXT_PUBLIC_API_URL` — URL of the API server (e.g., `https://dealxin-api.vercel.app/api`)
+Required environment variable:
+- `NEXT_PUBLIC_API_URL` — Backend API URL (e.g., `https://dealxin-api.up.railway.app/api`)
 
 ### Backend (Railway / Render / Fly.io)
 
-The API is a standard NestJS application:
-
 ```bash
 cd apps/api
-# Build
-pnpm build
-# Start
-node dist/main.js
+pnpm build && node dist/main.js
 ```
 
-Required environment variables:
-
-- `DATABASE_URL` — PostgreSQL connection string
-- `JWT_SECRET` — JWT signing secret
-- `JWT_REFRESH_SECRET` — JWT refresh signing secret
-- `JWT_ACCESS_EXPIRY` — JWT access token expiration (default: 15m)
-- `JWT_REFRESH_EXPIRY` — JWT refresh token expiration (default: 7d)
-- `REDIS_URL` — Redis connection string
-- `RABBITMQ_URL` — RabbitMQ connection string
-- `MEILISEARCH_HOST` — Meilisearch host
-- `MEILISEARCH_API_KEY` — Meilisearch API key
-- `CORS_ORIGIN` — Allowed CORS origins
-- `PORT` — Server port (default: 3001)
-
-### Database Migrations
-
-Run migrations on deploy:
-
-```bash
-cd apps/api
-pnpm prisma migrate deploy
-pnpm prisma generate
-```
+Required environment variables: `DATABASE_URL`, `JWT_SECRET`, `JWT_REFRESH_SECRET`, `REDIS_URL`, `RABBITMQ_URL`, `MEILISEARCH_HOST`, `MEILISEARCH_API_KEY`, `CORS_ORIGIN`, `PORT`.
 
 ## License
 

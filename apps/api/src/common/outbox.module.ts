@@ -1,10 +1,13 @@
 import { Module } from "@nestjs/common";
 
+import { OUTBOX_SERVICE } from "./di-tokens";
 import { OutboxService } from "./outbox.service";
-import { OutboxPublisherService } from "./outbox-publisher.service";
 
 @Module({
-  providers: [OutboxService, OutboxPublisherService],
-  exports: [OutboxService],
+  providers: [
+    OutboxService,
+    { provide: OUTBOX_SERVICE, useExisting: OutboxService },
+  ],
+  exports: [OutboxService, OUTBOX_SERVICE],
 })
 export class OutboxModule {}

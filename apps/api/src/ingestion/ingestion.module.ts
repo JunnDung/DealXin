@@ -2,6 +2,7 @@ import { Module } from "@nestjs/common";
 import { MulterModule } from "@nestjs/platform-express";
 
 import { CommonModule } from "../common/common.module";
+import { ADAPTER_FACTORY, INGESTION_SERVICE } from "../common/di-tokens";
 import { AdapterFactory } from "./adapters/adapter.factory";
 import {
   CSV_ADAPTER,
@@ -26,15 +27,16 @@ import { IngestionService } from "./ingestion.service";
   controllers: [IngestionController],
   providers: [
     IngestionService,
+    { provide: INGESTION_SERVICE, useExisting: IngestionService },
+    AdapterFactory,
+    { provide: ADAPTER_FACTORY, useExisting: AdapterFactory },
     // Adapters with tokens
     { provide: SHOPEE_ADAPTER, useClass: MockShopeeAdapter },
     { provide: LAZADA_ADAPTER, useClass: MockLazadaAdapter },
     { provide: TIKTOK_ADAPTER, useClass: MockTiktokShopAdapter },
     { provide: CSV_ADAPTER, useClass: CsvImportAdapter },
     { provide: JSON_ADAPTER, useClass: JsonImportAdapter },
-    // Factory
-    AdapterFactory,
   ],
-  exports: [IngestionService],
+  exports: [IngestionService, INGESTION_SERVICE],
 })
 export class IngestionModule {}

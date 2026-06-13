@@ -1,5 +1,7 @@
-import { Controller, Get, Query } from "@nestjs/common";
+import { Controller, Get, Inject as InjectCtrl, Query } from "@nestjs/common";
 import { ApiResponse, ApiTags } from "@nestjs/swagger";
+
+import { SEARCH_SERVICE } from "../common/di-tokens";
 
 import { Public } from "../auth/decorators";
 import { type SearchDealsOptions, type SearchService } from "./search.service";
@@ -7,7 +9,10 @@ import { type SearchDealsOptions, type SearchService } from "./search.service";
 @ApiTags("search")
 @Controller("search")
 export class SearchController {
-  constructor(private readonly searchService: SearchService) {}
+  constructor(
+    @InjectCtrl(SEARCH_SERVICE)
+    private readonly searchService: SearchService,
+  ) {}
 
   @Public()
   @Get("deals")

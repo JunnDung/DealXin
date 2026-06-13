@@ -62,7 +62,7 @@ export class AuthResponseDto {
   @ApiProperty()
   expiresIn!: number;
 
-  @ApiProperty({ type: UserResponseDto })
+  @ApiProperty({ type: () => UserResponseDto })
   user!: UserResponseDto;
 }
 

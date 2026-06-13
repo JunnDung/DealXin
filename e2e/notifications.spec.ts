@@ -2,8 +2,8 @@ import { test, expect } from "@playwright/test";
 
 test.describe("Notifications E2E", () => {
   const testUser = {
-    email: "demo@dealxin.com",
-    password: "demo123",
+    email: "demo@dealxin.local",
+    password: "Test1234!",
     name: "Demo User",
   };
 

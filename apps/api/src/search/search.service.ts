@@ -1,5 +1,6 @@
 import { Inject, Injectable, Logger } from "@nestjs/common";
 
+import { MEILISEARCH_SERVICE } from "../common/di-tokens";
 import { PRISMA_SERVICE } from "../prisma/prisma.constants";
 import { type PrismaService } from "../prisma/prisma.service";
 import { type MeilisearchService } from "./meilisearch.service";
@@ -20,6 +21,7 @@ export class SearchService {
   private readonly logger = new Logger(SearchService.name);
 
   constructor(
+    @Inject(MEILISEARCH_SERVICE)
     private readonly meilisearch: MeilisearchService,
     @Inject(PRISMA_SERVICE) private readonly prisma: PrismaService,
   ) {}

@@ -10,6 +10,58 @@ jobs:
   playwright:
     name: Playwright E2E
     runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: dealxin
+          POSTGRES_PASSWORD: dealxin_secret
+          POSTGRES_DB: dealxin
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      rabbitmq:
+        image: rabbitmq:3-management-alpine
+        env:
+          RABBITMQ_DEFAULT_USER: dealxin
+          RABBITMQ_DEFAULT_PASS: dealxin_secret
+        ports:
+          - 5672:5672
+          - 15672:15672
+        options: >-
+          --health-cmd "rabbitmq-diagnostics check_port_connectivity"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      meilisearch:
+        image: getmeili/meilisearch:latest
+        env:
+          MEILI_ENV: development
+        ports:
+          - 7700:7700
+        options: >-
+          --health-cmd "curl -f http://localhost:7700/health"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v4
 
@@ -30,10 +82,56 @@ jobs:
       - name: Generate Prisma Client
         run: pnpm --filter api prisma:generate
 
-      - name: Build
+      - name: Run DB migrations
+        run: pnpm --filter api db:migrate:deploy
+        env:
+          DATABASE_URL: postgresql://dealxin:dealxin_secret@localhost:5432/dealxin
+
+      - name: Seed database
+        run: pnpm --filter api db:seed
+        env:
+          DATABASE_URL: postgresql://dealxin:dealxin_secret@localhost:5432/dealxin
+
+      - name: Build packages
         run: pnpm build
-        continue-on-error: true
+
+      - name: Start API server
+        run: pnpm --filter api start:dev &
+        env:
+          DATABASE_URL: postgresql://dealxin:dealxin_secret@localhost:5432/dealxin
+          REDIS_URL: redis://localhost:6379
+          RABBITMQ_URL: amqp://dealxin:dealxin_secret@localhost:5672
+          MEILISEARCH_HOST: http://localhost:7700
+          NODE_ENV: development
+        env:
+          DATABASE_URL: postgresql://dealxin:dealxin_secret@localhost:5432/dealxin
+          REDIS_URL: redis://localhost:6379
+          RABBITMQ_URL: amqp://dealxin:dealxin_secret@localhost:5672
+          MEILISEARCH_HOST: http://localhost:7700
+          NODE_ENV: development
+
+      - name: Wait for API health
+        run: |
+          for i in {1..30}; do
+            curl -sf http://localhost:3001/api/health && break
+            sleep 2
+          done
+
+      - name: Start Web server
+        run: pnpm --filter web dev &
+        env:
+          NODE_ENV: development
+          NEXT_PUBLIC_API_URL: http://localhost:3001/api
+
+      - name: Wait for Web health
+        run: |
+          for i in {1..30}; do
+            curl -sf http://localhost:3000 && break
+            sleep 2
+          done
 
       - name: Run Playwright tests
         run: npx playwright test
-        continue-on-error: true
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:3000
+          API_BASE_URL: http://localhost:3001

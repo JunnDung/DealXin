@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 export default function RootErrorBoundary({
   error,
   reset,
@@ -49,7 +51,7 @@ export default function RootErrorBoundary({
             >
               Thử lại
             </button>
-            <a
+            <Link
               href="/"
               style={{
                 padding: "0.625rem 1.5rem",
@@ -63,7 +65,7 @@ export default function RootErrorBoundary({
               }}
             >
               Về trang chủ
-            </a>
+            </Link>
           </div>
         </div>
       </body>

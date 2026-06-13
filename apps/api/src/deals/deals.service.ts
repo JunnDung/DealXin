@@ -7,9 +7,8 @@ import {
 } from "@nestjs/common";
 import { type Deal, DealStatus } from "@prisma/client";
 
+import { AUDIT_LOG_SERVICE, MESSAGING_SERVICE, OUTBOX_SERVICE } from "../common/di-tokens";
 import { type AuditLogService } from "../common/audit-log.service";
-import { MESSAGING_SERVICE } from "../common/di-tokens";
-import { AUDIT_LOG_SERVICE } from "../common/di-tokens";
 import { type OutboxService } from "../common/outbox.service";
 import { PaginatedResponse } from "../common/pagination";
 import { type MessagingService } from "../messaging/messaging.service";
@@ -55,7 +54,7 @@ export class DealsService {
     @Inject(DEAL_REPOSITORY) private readonly repository: DealRepository,
     @Inject(DEAL_STATUS_STRATEGY)
     private readonly statusTransition: DealStatusTransitionStrategy,
-    private readonly outbox: OutboxService,
+    @Inject(OUTBOX_SERVICE) private readonly outbox: OutboxService,
     @Inject(MESSAGING_SERVICE)
     private readonly messagingService: MessagingService,
   ) {}

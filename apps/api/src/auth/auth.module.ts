@@ -1,8 +1,9 @@
 import { Module } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { JwtModule } from "@nestjs/jwt";
+import { JwtModule, JwtService } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
 
+import { AUTH_SERVICE, JWT_SERVICE } from "../common/di-tokens";
 import { PrismaModule } from "../prisma/prisma.module";
 import { AuthController } from "./auth.controller";
 import { AuthService } from "./auth.service";
@@ -31,7 +32,14 @@ import { JwtRefreshStrategy } from "./strategies/jwt-refresh.strategy";
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, JwtRefreshStrategy, RolesGuard],
-  exports: [AuthService],
+  providers: [
+    AuthService,
+    { provide: AUTH_SERVICE, useExisting: AuthService },
+    JwtStrategy,
+    JwtRefreshStrategy,
+    RolesGuard,
+    { provide: JWT_SERVICE, useExisting: JwtService },
+  ],
+  exports: [AuthService, AUTH_SERVICE, JWT_SERVICE],
 })
 export class AuthModule {}

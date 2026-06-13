@@ -1,6 +1,8 @@
-import { Controller, Get, Query, UseGuards } from "@nestjs/common";
+import { Controller, Get, Inject, Query, UseGuards } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
 import { UserRole } from "@prisma/client";
+
+import { ANALYTICS_SERVICE } from "../common/di-tokens";
 
 import { Roles } from "../auth/decorators/roles.decorator";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
@@ -10,7 +12,10 @@ import { type AnalyticsService } from "./analytics.service";
 @Controller("admin/analytics")
 @UseGuards(JwtAuthGuard)
 export class AnalyticsController {
-  constructor(private readonly analyticsService: AnalyticsService) {}
+  constructor(
+    @Inject(ANALYTICS_SERVICE)
+    private readonly analyticsService: AnalyticsService,
+  ) {}
 
   @Get("overview")
   @Roles(UserRole.ADMIN)

@@ -1,4 +1,7 @@
-export { type SourceAdapter, type SourceType } from "./source-adapter.interface";
+export {
+  type SourceAdapter,
+  type SourceType,
+} from "./source-adapter.interface";
 
 export const SHOPEE_ADAPTER = "SHOPEE_ADAPTER";
 export const LAZADA_ADAPTER = "LAZADA_ADAPTER";

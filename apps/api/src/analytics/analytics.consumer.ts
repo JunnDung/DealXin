@@ -1,6 +1,7 @@
-import { Injectable, Logger, type OnModuleInit } from "@nestjs/common";
+import { Inject, Injectable, Logger, type OnModuleInit } from "@nestjs/common";
 import { type AnalyticsEventType } from "@prisma/client";
 
+import { ANALYTICS_SERVICE, MESSAGING_SERVICE } from "../common/di-tokens";
 import { type MessagingService } from "../messaging/messaging.service";
 import { Queues } from "../messaging/routing-keys";
 import { type AnalyticsService } from "./analytics.service";
@@ -10,7 +11,9 @@ export class AnalyticsConsumer implements OnModuleInit {
   private readonly logger = new Logger(AnalyticsConsumer.name);
 
   constructor(
+    @Inject(MESSAGING_SERVICE)
     private readonly messagingService: MessagingService,
+    @Inject(ANALYTICS_SERVICE)
     private readonly analyticsService: AnalyticsService,
   ) {}
 

@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Inject,
   Param,
   Patch,
   Query,
@@ -16,6 +17,7 @@ import {
   ApiTags,
 } from "@nestjs/swagger";
 
+import { NOTIFICATION_SERVICE } from "../common/di-tokens";
 import { type AuthenticatedUser, CurrentUser } from "../auth/decorators";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import {
@@ -31,7 +33,10 @@ import { type NotificationService } from "./notification.service";
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class NotificationController {
-  constructor(private readonly notificationService: NotificationService) {}
+  constructor(
+    @Inject(NOTIFICATION_SERVICE)
+    private readonly notificationService: NotificationService,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: "Get paginated list of notifications" })

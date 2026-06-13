@@ -10,6 +10,7 @@ import { type User } from "@prisma/client";
 import * as bcrypt from "bcrypt";
 import * as crypto from "crypto";
 
+import { JWT_SERVICE } from "../common/di-tokens";
 import { PRISMA_SERVICE } from "../prisma/prisma.constants";
 import { type PrismaService } from "../prisma/prisma.service";
 import {
@@ -26,7 +27,7 @@ export class AuthService {
 
   constructor(
     @Inject(PRISMA_SERVICE) private readonly prisma: PrismaService,
-    private readonly jwt: JwtService,
+    @Inject(JWT_SERVICE) private readonly jwt: JwtService,
   ) {}
 
   async register(dto: RegisterDto): Promise<AuthResponseDto> {

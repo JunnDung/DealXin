@@ -1,3 +1,5 @@
 import { nextjs } from "@dealxin/eslint-config";
 
-export default [...nextjs];
+const config = [...nextjs];
+
+export default config;

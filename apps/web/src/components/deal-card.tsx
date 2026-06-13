@@ -10,6 +10,7 @@ import {
   ThumbsUp,
   TrendingUp,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -111,9 +112,10 @@ export function DealCard({
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const now = useState(() => Date.now())[0];
   const isHot = deal.score >= 80 || localUpvotes >= 50;
   const isExpiring =
-    deal.endDate && new Date(deal.endDate).getTime() - Date.now() < 86400000;
+    deal.endDate && new Date(deal.endDate).getTime() - now < 86400000;
 
   const hasCoupon = !!deal.couponCode;
   const hasDiscount = deal.discountPercent > 0;
@@ -136,10 +138,11 @@ export function DealCard({
           className="relative block overflow-hidden bg-muted"
           style={{ aspectRatio: "16/9" }}
         >
-          <img
+          <Image
             src={deal.imageUrl}
             alt={deal.title}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            fill
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
           />
           {/* Discount badge */}
           {hasDiscount && (
@@ -159,10 +162,7 @@ export function DealCard({
             <div className="absolute bottom-0 left-0 right-0 bg-red-600/90 px-2 py-1 text-center text-xs font-semibold text-white">
               <Clock className="mr-1 inline-block h-3 w-3" />
               Sắp hết hạn — còn{" "}
-              {Math.ceil(
-                (new Date(deal.endDate!).getTime() - Date.now()) / 3600000,
-              )}
-              h
+              {Math.ceil((new Date(deal.endDate!).getTime() - now) / 3600000)}h
             </div>
           )}
         </Link>

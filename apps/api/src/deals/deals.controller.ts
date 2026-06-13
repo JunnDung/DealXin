@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Inject,
   Param,
   Patch,
   Post,
@@ -16,6 +17,8 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
+
+import { DEALS_SERVICE } from "../common/di-tokens";
 
 import {
   type AuthenticatedUser,
@@ -38,7 +41,10 @@ import {
 @ApiTags("Deals")
 @Controller()
 export class DealsController {
-  constructor(private readonly deals: DealsService) {}
+  constructor(
+    @Inject(DEALS_SERVICE)
+    private readonly deals: DealsService,
+  ) {}
 
   // ===== PUBLIC =====
 

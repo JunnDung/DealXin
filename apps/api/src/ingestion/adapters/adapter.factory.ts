@@ -1,6 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common";
 
-import { type SourceAdapter, type SourceType } from "./source-adapter.interface";
 import {
   CSV_ADAPTER,
   JSON_ADAPTER,
@@ -13,6 +12,10 @@ import { type JsonImportAdapter } from "./json-import.adapter";
 import { type MockLazadaAdapter } from "./mock-lazada.adapter";
 import { type MockShopeeAdapter } from "./mock-shopee.adapter";
 import { type MockTiktokShopAdapter } from "./mock-tiktok-shop.adapter";
+import {
+  type SourceAdapter,
+  type SourceType,
+} from "./source-adapter.interface";
 
 @Injectable()
 export class AdapterFactory {
@@ -21,7 +24,8 @@ export class AdapterFactory {
   constructor(
     @Inject(SHOPEE_ADAPTER) private readonly shopeeAdapter: MockShopeeAdapter,
     @Inject(LAZADA_ADAPTER) private readonly lazadaAdapter: MockLazadaAdapter,
-    @Inject(TIKTOK_ADAPTER) private readonly tiktokAdapter: MockTiktokShopAdapter,
+    @Inject(TIKTOK_ADAPTER)
+    private readonly tiktokAdapter: MockTiktokShopAdapter,
     @Inject(CSV_ADAPTER) private readonly csvAdapter: CsvImportAdapter,
     @Inject(JSON_ADAPTER) private readonly jsonAdapter: JsonImportAdapter,
   ) {

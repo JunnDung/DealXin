@@ -3,13 +3,13 @@ import { test, expect } from "@playwright/test";
 // ─── Test accounts (seed data) ───────────────────────────────────────────────
 const ADMIN_USER = {
   email: "admin@dealxin.local",
-  password: "admin123",
+  password: "Admin1234!",
   name: "Admin User",
 };
 
 const REGULAR_USER = {
   email: "demo@dealxin.local",
-  password: "user1234",
+  password: "Test1234!",
   name: "Demo User",
 };
 
