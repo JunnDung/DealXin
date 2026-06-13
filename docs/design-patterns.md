@@ -268,7 +268,11 @@ export class DealsService {
 ### Files
 - All services use constructor injection
 - `apps/api/src/deals/deals.module.ts` — Binds tokens to implementations
-- `apps/api/src/deals/deals.tokens.ts` — Token constants
+- `apps/api/src/deals/deals.tokens.ts` — Deal-specific token constants
+- `apps/api/src/common/di-tokens.ts` — App-wide token constants (AUDIT_LOG_SERVICE, MESSAGING_SERVICE)
+- `apps/api/src/prisma/prisma.constants.ts` — PRISMA_SERVICE token for global Prisma injection
+- `apps/api/src/common/common.module.ts` — Global module exporting AUDIT_LOG_SERVICE via token
+- `apps/api/src/messaging/messaging.module.ts` — Global module exporting MESSAGING_SERVICE via token
 
 ---
 
